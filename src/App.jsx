@@ -22,7 +22,6 @@ import img4 from './assets/img4.jpg';
 import img5 from './assets/img5.jpg';
 import logoImg from './assets/logo.png';
 
-// Importação corrigida para usar o componente Helmet
 import { Helmet } from 'react-helmet-async';
 
 
