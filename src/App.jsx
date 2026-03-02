@@ -217,7 +217,7 @@ const App = () => {
 
             {/* Instagram Bio Integration */}
             <div className="flex flex-wrap gap-x-4 gap-y-2 text-orange-500 font-black uppercase tracking-widest text-sm mb-10 border-l-4 border-orange-600 pl-6">
-              <span>Pavers</span> | <span>Brick</span> | <span>Walkways</span> | <span>Stone Walls</span> | <span>Excavation</span> | <span>Fences</span>
+              <span>Pavers</span> | <span>Brick</span> | <span>Walkways</span> | <span>Stone Walls</span> | <span>Excavation</span> | <span>Fences</span> | <span>Paint</span> 
             </div>
 
             <div className="flex flex-col sm:flex-row gap-6">
