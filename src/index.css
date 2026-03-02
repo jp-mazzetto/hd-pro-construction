@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+/* Ajustes Globais para Melhor Fluidez */
+:root {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Garante que o container do Tailwind nunca cause overflow horizontal */
+.container {
+  max-width: 100%;
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1200px;
+  }
+}
