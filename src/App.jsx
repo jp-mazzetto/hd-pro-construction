@@ -157,8 +157,12 @@ const App = () => {
     { title: "Walkways", desc: "Beautifully designed paths that add value to your property." },
     { title: "Stone Walls", desc: "Robust and aesthetic natural stone retaining walls." },
     { title: "Excavation", desc: "Precision site clearing, grading, and earth moving." },
-    { title: "Fences", desc: "Quality residential and commercial fencing solutions." }
+    { title: "Fences", desc: "Quality residential and commercial fencing solutions." },
+    { title: "Paint", desc: "High-end interior and exterior painting services to transform your home's look." },
+    { title: "Landscape", desc: "Full-service landscape design and maintenance to create your dream outdoor oasis." },
+    { title: "Deck", desc: "Custom deck design and construction using premium materials built to last." }
   ];
+  
 
   return (
     <>
@@ -235,7 +239,7 @@ const App = () => {
 
               {/* Instagram Bio Integration */}
               <div className="flex flex-wrap gap-x-4 gap-y-2 text-orange-500 font-black uppercase tracking-widest text-sm mb-10 border-l-4 border-orange-600 pl-6">
-                <span>Pavers</span> | <span>Brick</span> | <span>Walkways</span> | <span>Stone Walls</span> | <span>Excavation</span> | <span>Fences</span> | <span>Paint</span> 
+                <span>Pavers</span> | <span>Brick</span> | <span>Walkways</span> | <span>Stone Walls</span> | <span>Excavation</span> | <span>Fences</span> | <span>Paint</span> | <span>Landscape</span> | <span>Decks</span> 
               </div>
 
               <div className="flex flex-col sm:flex-row gap-6">
