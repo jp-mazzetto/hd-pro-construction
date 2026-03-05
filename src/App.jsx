@@ -147,8 +147,22 @@ const App = () => {
   }, []);
 
   const phoneNumber = "+18572492409";
-  const handleSmsRequest = () => {
-    window.location.href = `sms:${phoneNumber}?body=Hi HD Pro Construction, I saw your website and I'd like to request a free estimate.`;
+
+  const smsTemplates = {
+    Pavers: "Hi HD Pro Construction, I saw your website and I’d like a free estimate for a paver installation project.",
+    "Brick Work": "Hi HD Pro Construction, I’m interested in brick work for my property and would like to request a free estimate.",
+    Walkways: "Hi HD Pro Construction, I’d like to get a free estimate for building a new walkway at my property.",
+    "Stone Walls": "Hi HD Pro Construction, I’m looking to build a stone wall and would like to request a free estimate.",
+    Excavation: "Hi HD Pro Construction, I need excavation work done and would like to request a free estimate.",
+    Fences: "Hi HD Pro Construction, I’m interested in installing a fence and would like a free estimate.",
+    Paint: "Hi HD Pro Construction, I’d like a free estimate for a painting project (interior or exterior).",
+    Landscape: "Hi HD Pro Construction, I’m interested in landscaping services and would like a free estimate.",
+    Deck: "Hi HD Pro Construction, I’d like to request a free estimate for building a deck."
+  };
+
+  const handleSmsRequest = (service) => {
+    const message = service ? smsTemplates[service] : "Hi HD Pro Construction, I saw your website and I'd like to request a free estimate.";
+    window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
   };
 
   const services = [
@@ -218,7 +232,6 @@ const App = () => {
           </div>
         )}
 
-        {/* Hero Section */}
         <header className="relative h-screen flex items-center overflow-hidden text-left">
           <div className="absolute inset-0 bg-gray-900">
             <div className="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=2070')] bg-cover bg-center"></div>
@@ -318,7 +331,7 @@ const App = () => {
                     </div>
                   ))}
                   
-                  {/* Carousel Controls */}
+                  {/* Carrosel */}
                   <button 
                     onClick={prevSlide}
                     className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-orange-600 p-3 rounded-full backdrop-blur-md transition-all opacity-0 group-hover:opacity-100"
@@ -343,7 +356,7 @@ const App = () => {
                   </div>
                </div>
                
-               {/* Decorative Background Glow */}
+               {/* Background Glow */}
                <div className="absolute -top-10 -left-10 w-40 h-40 bg-orange-600 rounded-full blur-[100px] opacity-20 animate-pulse"></div>
                
                {/* Instagram Link Overlay Badge */}
