@@ -299,7 +299,7 @@ const App = () => {
                    <p className="text-gray-500 font-medium leading-relaxed mb-8">
                      {service.desc}
                    </p>
-                   <div className="flex items-center gap-2 text-orange-600 font-black uppercase tracking-widest text-xs group-hover:gap-4 transition-all cursor-pointer" onClick={handleSmsRequest}>
+                  <div className="flex items-center gap-2 text-orange-600 font-black uppercase tracking-widest text-xs group-hover:gap-4 transition-all cursor-pointer" onClick={() => handleSmsRequest(service.title)}>
                      Book Now <ChevronRight size={16} />
                    </div>
                 </div>
