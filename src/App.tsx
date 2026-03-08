@@ -1,17 +1,15 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Phone,
   MessageSquare,
   CheckCircle,
   MapPin,
-  Clock,
   Instagram,
   Menu,
   X,
   ChevronLeft,
   ChevronRight,
   Tractor,
-  BrickWall,
   ExternalLink,
 } from "lucide-react";
 
@@ -20,133 +18,78 @@ import img2 from "./assets/img2.jpg";
 import img3 from "./assets/img3.jpg";
 import img4 from "./assets/img4.jpg";
 import img5 from "./assets/img5.jpg";
-import logoImg from "./assets/logo.png";
+import Button from "./components/Button";
+import BrandLogo from "./components/BrandLogo";
+import SectionTitle from "./components/SectionTitle";
 
 import { Helmet } from "react-helmet-async";
 
-const Button = ({ children, onClick, className = "", variant = "primary" }) => {
-  const baseStyles =
-    "px-6 py-4 rounded-md font-black uppercase tracking-tighter transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2";
-  const variants = {
-    primary:
-      "bg-orange-600 text-white hover:bg-orange-700 shadow-lg shadow-orange-900/40",
-    secondary: "bg-white text-gray-900 hover:bg-gray-100 shadow-xl",
-    outline:
-      "border-2 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white",
-  };
+type ServiceName =
+  | "Pavers"
+  | "Brick Work"
+  | "Walkways"
+  | "Stone Walls"
+  | "Excavation"
+  | "Fences"
+  | "Paint"
+  | "Landscape"
+  | "Deck";
 
-  return (
-    <button
-      onClick={onClick}
-      className={`${baseStyles} ${variants[variant]} ${className}`}
-    >
-      {children}
-    </button>
-  );
-};
+interface InstagramPost {
+  url: string;
+  link: string;
+  caption: string;
+}
 
-// Brand Logo Component
-const BrandLogo = ({ light = false, className = "" }) => (
-  <div className={`flex items-center gap-3 ${className}`}>
-    <div className="relative group">
-      <div
-        className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl overflow-hidden shadow-lg border-2 ${
-          light ? "border-white/20" : "border-gray-200"
-        } transition-all duration-300 scale-105`}
-      >
-        <img
-          src={logoImg}
-          alt="HD Pro Construction Logo"
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            e.target.src = "https://via.placeholder.com/150?text=HD+PRO";
-          }}
-        />
-      </div>
-    </div>
+interface Service {
+  title: ServiceName;
+  desc: string;
+}
 
-    <div className="flex flex-col leading-none text-left">
-      <span
-        className={`text-2xl md:text-3xl font-black italic tracking-tighter ${
-          light ? "text-white" : "text-gray-500"
-        }`}
-      >
-        HD{""}
-        <span
-          className="text-[22px] text-orange-600"
-          style={{
-            textShadow: "3px 2px 1px rgba(1, 1, 1, 100)",
-          }}
-        >
-          PRO
-        </span>
-      </span>
-
-      <span
-        className={`text-[10px] font-bold tracking-[0.3em] uppercase ${
-          light ? "text-orange-400" : "text-gray-500"
-        }`}
-      >
-        Construction INC
-      </span>
-    </div>
-  </div>
-);
-
-const SectionTitle = ({ children, subtitle }) => (
-  <div className="text-center mb-16">
-    <h2 className="text-4xl md:text-6xl font-black text-gray-900 mb-4 uppercase italic tracking-tighter">
-      {children}
-    </h2>
-    <div className="w-32 h-2 bg-orange-600 mx-auto mb-6"></div>
-    {subtitle && (
-      <p className="text-gray-500 max-w-2xl mx-auto font-medium">{subtitle}</p>
-    )}
-  </div>
-);
+const IG_POSTS: InstagramPost[] = [
+  {
+    url: img1,
+    link: "https://www.instagram.com/p/DLaxLm0J1f9/",
+    caption: "High-quality paver project.",
+  },
+  {
+    url: img2,
+    link: "https://www.instagram.com/p/DIQtl7kuggE/",
+    caption: "Professional masonry work.",
+  },
+  {
+    url: img3,
+    link: "https://www.instagram.com/p/C_CGh4CJkYu/",
+    caption: "Modern outdoor walkway design.",
+  },
+  {
+    url: img4,
+    link: "https://www.instagram.com/p/DVWeq_yifvz/",
+    caption: "Precision excavation and grading.",
+  },
+  {
+    url: img5,
+    link: "https://www.instagram.com/p/DOfirlYDTIz/",
+    caption: "Premium stone wall construction.",
+  },
+];
 
 const App = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
 
-  const igPosts = [
-    {
-      url: img1,
-      link: "https://www.instagram.com/p/DLaxLm0J1f9/",
-      caption: "High-quality paver project.",
-    },
-    {
-      url: img2,
-      link: "https://www.instagram.com/p/DIQtl7kuggE/",
-      caption: "Professional masonry work.",
-    },
-    {
-      url: img3,
-      link: "https://www.instagram.com/p/C_CGh4CJkYu/",
-      caption: "Modern outdoor walkway design.",
-    },
-    {
-      url: img4,
-      link: "https://www.instagram.com/p/DVWeq_yifvz/",
-      caption: "Precision excavation and grading.",
-    },
-    {
-      url: img5,
-      link: "https://www.instagram.com/p/DOfirlYDTIz/",
-      caption: "Premium stone wall construction.",
-    },
-  ];
-
-  const nextSlide = () => setActiveSlide((prev) => (prev + 1) % igPosts.length);
+  const nextSlide = () => setActiveSlide((prev) => (prev + 1) % IG_POSTS.length);
   const prevSlide = () =>
-    setActiveSlide((prev) => (prev - 1 + igPosts.length) % igPosts.length);
+    setActiveSlide((prev) => (prev - 1 + IG_POSTS.length) % IG_POSTS.length);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
 
-    const interval = setInterval(nextSlide, 5000);
+    const interval = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % IG_POSTS.length);
+    }, 5000);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -156,7 +99,7 @@ const App = () => {
 
   const phoneNumber = "+18572492409";
 
-  const smsTemplates = {
+  const smsTemplates: Record<ServiceName, string> = {
     Pavers:
       "Hi HD Pro Construction, I saw your website and I’d like a free estimate for a paver installation project.",
     "Brick Work":
@@ -176,14 +119,14 @@ const App = () => {
     Deck: "Hi HD Pro Construction, I’d like to request a free estimate for building a deck.",
   };
 
-  const handleSmsRequest = (service) => {
+  const handleSmsRequest = (service?: ServiceName) => {
     const message = service
       ? smsTemplates[service]
       : "Hi HD Pro Construction, I saw your website and I'd like to request a free estimate.";
     window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
   };
 
-  const services = [
+  const services: Service[] = [
     {
       title: "Pavers",
       desc: "Expert installation of interlocking concrete and stone pavers.",
@@ -454,7 +397,7 @@ const App = () => {
             {/* Instagram Post Carousel */}
             <div className="relative group">
               <div className="relative z-10 rounded-3xl overflow-hidden border-8 border-gray-800 shadow-2xl aspect-square bg-gray-800">
-                {igPosts.map((post, idx) => (
+                {IG_POSTS.map((post, idx) => (
                   <div
                     key={idx}
                     className={`absolute inset-0 transition-all duration-700 ease-in-out transform ${idx === activeSlide ? "opacity-100 scale-100" : "opacity-0 scale-110 pointer-events-none"}`}
@@ -495,7 +438,7 @@ const App = () => {
 
                 {/* Indicators */}
                 <div className="absolute top-4 right-4 flex gap-2">
-                  {igPosts.map((_, idx) => (
+                  {IG_POSTS.map((_, idx) => (
                     <div
                       key={idx}
                       className={`h-1 w-6 rounded-full transition-all ${idx === activeSlide ? "bg-orange-600" : "bg-white/20"}`}
