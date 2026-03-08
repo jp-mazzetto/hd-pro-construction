@@ -10,6 +10,9 @@ import BrandLogo from "../BrandLogo";
 
 const instagramProfileUrl = "https://www.instagram.com/hd_pro_construction_inc/";
 
+/**
+ * Rodape institucional com dados de contato, links de navegacao e rede social.
+ */
 const SiteFooter = () => {
   const currentYear = new Date().getFullYear();
 

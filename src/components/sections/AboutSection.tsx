@@ -6,6 +6,9 @@ import InstagramCarousel from "./InstagramCarousel";
 
 const instagramProfileUrl = "https://www.instagram.com/hd_pro_construction_inc/";
 
+/**
+ * Secao institucional com prova social (Instagram) e diferenciais da empresa.
+ */
 const AboutSection = () => {
   const { activeIndex, next, prev, goTo } = useCarousel(IG_POSTS.length);
 

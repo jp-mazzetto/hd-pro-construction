@@ -1,5 +1,8 @@
 import { Helmet } from "react-helmet-async";
 
+/**
+ * Configura metadados SEO e social (Open Graph/Twitter) da landing page.
+ */
 const AppSeo = () => {
   return (
     <Helmet>

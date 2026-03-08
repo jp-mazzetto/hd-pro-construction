@@ -7,6 +7,9 @@ interface ServicesSectionProps {
   onServiceRequest: (service: ServiceName) => void;
 }
 
+/**
+ * Secao que lista os servicos da empresa com CTA por item.
+ */
 const ServicesSection = ({ onServiceRequest }: ServicesSectionProps) => {
   return (
     <section id="services" className="py-32 bg-gray-50 relative text-left">

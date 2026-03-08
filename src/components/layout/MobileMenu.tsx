@@ -10,6 +10,9 @@ interface MobileMenuProps {
   onEstimateClick: () => void;
 }
 
+/**
+ * Overlay de navegacao mobile com links de secao e CTA de estimativa.
+ */
 const MobileMenu = ({ isOpen, onClose, onEstimateClick }: MobileMenuProps) => {
   if (!isOpen) {
     return null;

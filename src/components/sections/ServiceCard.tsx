@@ -7,6 +7,9 @@ interface ServiceCardProps {
   onRequest: (service: ServiceName) => void;
 }
 
+/**
+ * Card individual de servico com acao para abrir pedido via SMS.
+ */
 const ServiceCard = ({ service, onRequest }: ServiceCardProps) => {
   return (
     <article className="group bg-white p-10 rounded-2xl shadow-xl hover:shadow-2xl transition-all border-l-8 border-transparent hover:border-orange-600 relative overflow-hidden">

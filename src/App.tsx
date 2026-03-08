@@ -18,6 +18,10 @@ import {
   navigateToHref,
 } from "./utils/contact";
 
+/**
+ * Componente raiz da aplicação, responsável por orquestrar layout, navegação
+ * mobile e ações de contato (SMS/ligação).
+ */
 const App = () => {
   const scrolled = useScrollThreshold(50);
   const { value: isMenuOpen, toggle: toggleMenu, setFalse: closeMenu } =

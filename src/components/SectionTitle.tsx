@@ -5,6 +5,9 @@ interface SectionTitleProps {
   subtitle?: string;
 }
 
+/**
+ * Titulo padrao de secao com subtitulo opcional e estilo consistente.
+ */
 export default function SectionTitle({ children, subtitle }: SectionTitleProps) {
   return (
     <div className="text-center mb-16">

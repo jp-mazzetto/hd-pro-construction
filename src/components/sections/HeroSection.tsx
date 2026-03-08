@@ -7,6 +7,9 @@ interface HeroSectionProps {
   onEstimateClick: () => void;
 }
 
+/**
+ * Secao hero com proposta principal da marca e CTA para solicitar estimativa.
+ */
 const HeroSection = ({ onEstimateClick }: HeroSectionProps) => {
   return (
     <header className="relative h-screen flex items-center overflow-hidden text-left">

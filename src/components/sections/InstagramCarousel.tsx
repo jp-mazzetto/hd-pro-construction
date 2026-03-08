@@ -17,6 +17,9 @@ interface InstagramCarouselProps {
 
 const instagramProfileUrl = "https://www.instagram.com/hd_pro_construction_inc/";
 
+/**
+ * Carrossel de posts do Instagram com navegacao manual e indicador de slide.
+ */
 const InstagramCarousel = ({
   posts,
   activeSlide,

@@ -19,6 +19,29 @@ interface UseCarouselReturn {
 
 const DEFAULT_DELAY = 5000;
 
+/**
+ * Controla indice de carrossel com navegacao manual e autoplay opcional.
+ *
+ * @param totalItems Quantidade total de itens do carrossel.
+ * @param options Configuracoes como `autoPlayDelay` em milissegundos.
+ * @returns Estado e acoes para controlar o carrossel.
+ *
+ * @example
+ * ```tsx
+ * const { activeIndex, next, prev, goTo } = useCarousel(posts.length, {
+ *   autoPlayDelay: 4000,
+ * });
+ *
+ * return (
+ *   <>
+ *     <img src={posts[activeIndex].url} alt={posts[activeIndex].caption} />
+ *     <button onClick={prev}>Anterior</button>
+ *     <button onClick={next}>Proximo</button>
+ *     <button onClick={() => goTo(0)}>Primeiro</button>
+ *   </>
+ * );
+ * ```
+ */
 const useCarousel = (
   totalItems: number,
   options: UseCarouselOptions = {},

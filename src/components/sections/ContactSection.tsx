@@ -8,6 +8,9 @@ interface ContactSectionProps {
   onCallClick: () => void;
 }
 
+/**
+ * Secao final de conversao com CTAs de SMS e ligacao.
+ */
 const ContactSection = ({
   onEstimateClick,
   onCallClick,

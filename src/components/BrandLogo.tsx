@@ -9,6 +9,9 @@ interface BrandLogoProps {
 
 const FALLBACK_LOGO = "https://via.placeholder.com/150?text=HD+PRO";
 
+/**
+ * Exibe o logo da marca com variacao clara/escura e fallback de imagem.
+ */
 export default function BrandLogo({
   light = false,
   className = "",

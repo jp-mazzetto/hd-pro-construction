@@ -21,6 +21,9 @@ const variants: Record<ButtonVariant, string> = {
     "border-2 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white",
 };
 
+/**
+ * Botao reutilizavel com variantes visuais para CTAs e acoes do site.
+ */
 export default function Button({
   children,
   onClick,

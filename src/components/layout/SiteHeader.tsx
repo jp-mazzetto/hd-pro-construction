@@ -11,6 +11,9 @@ interface SiteHeaderProps {
   onEstimateClick: () => void;
 }
 
+/**
+ * Cabecalho principal com navegacao desktop, CTA e toggle do menu mobile.
+ */
 const SiteHeader = ({
   scrolled,
   isMenuOpen,
