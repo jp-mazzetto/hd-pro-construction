@@ -1,6 +1,6 @@
 import type { SyntheticEvent } from "react";
 
-import logoImg from "../assets/logo.png";
+import logoImg from "../assets/imgs/logo.webp";
 
 interface BrandLogoProps {
   light?: boolean;
