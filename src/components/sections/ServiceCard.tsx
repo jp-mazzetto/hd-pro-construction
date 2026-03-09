@@ -1,4 +1,4 @@
-import { ChevronRight, Tractor } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 import type { Service, ServiceName } from "../../consts/site";
 
@@ -12,21 +12,39 @@ interface ServiceCardProps {
  */
 const ServiceCard = ({ service, onRequest }: ServiceCardProps) => {
   return (
-    <article className="group bg-white p-10 rounded-2xl shadow-xl hover:shadow-2xl transition-all border-l-8 border-transparent hover:border-orange-600 relative overflow-hidden">
-      <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity">
-        <Tractor size={120} />
+    <article className="group relative isolate min-h-[24rem] overflow-hidden rounded-[2rem] bg-gray-900 shadow-xl transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl">
+      <img
+        src={service.imageSrc}
+        alt={service.imageAlt}
+        loading="lazy"
+        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+      />
+
+      <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/65 to-gray-950/20 transition-all duration-500 group-hover:from-gray-950/95 group-hover:via-gray-900/50" />
+
+      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-orange-500 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+      <div className="relative flex h-full flex-col justify-end p-7 sm:p-8">
+        <p className="mb-3 text-[10px] font-black uppercase tracking-[0.28em] text-orange-300">
+          HD Pro Construction
+        </p>
+
+        <h3 className="mb-3 text-3xl font-black uppercase italic tracking-tighter text-white transition-colors duration-300 group-hover:text-orange-300">
+          {service.title}
+        </h3>
+
+        <p className="max-w-[32ch] text-sm font-medium leading-relaxed text-gray-200">
+          {service.desc}
+        </p>
+
+        <button
+          type="button"
+          className="mt-7 inline-flex w-fit items-center gap-2 rounded-full border border-orange-400/40 bg-orange-600/10 px-5 py-2 text-[11px] font-black uppercase tracking-[0.2em] text-orange-200 transition-all duration-300 group-hover:bg-orange-600 group-hover:text-white hover:gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
+          onClick={() => onRequest(service.title)}
+        >
+          Book Now <ChevronRight size={16} />
+        </button>
       </div>
-      <h3 className="text-3xl font-black mb-4 uppercase italic tracking-tighter group-hover:text-orange-600 transition-colors">
-        {service.title}
-      </h3>
-      <p className="text-gray-500 font-medium leading-relaxed mb-8">{service.desc}</p>
-      <button
-        type="button"
-        className="flex items-center gap-2 text-orange-600 font-black uppercase tracking-widest text-xs group-hover:gap-4 transition-all"
-        onClick={() => onRequest(service.title)}
-      >
-        Book Now <ChevronRight size={16} />
-      </button>
     </article>
   );
 };

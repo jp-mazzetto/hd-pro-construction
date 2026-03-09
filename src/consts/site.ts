@@ -3,6 +3,15 @@ import img2 from "../assets/imgs/img2.webp";
 import img3 from "../assets/imgs/img3.webp";
 import img4 from "../assets/imgs/img4.webp";
 import img5 from "../assets/imgs/img5.webp";
+import backyardPaverPatioFence from "../assets/imgs/services/backyard-paver-patio-fence.jpeg";
+import brickWalkwayBeforeAfterMilton from "../assets/imgs/services/brick-walkway-before-after-milton.jpeg";
+import deckPatioRenovation from "../assets/imgs/services/deck-patio-renovation.jpeg";
+import paintedHouseCurvedWalkway from "../assets/imgs/services/painted-house-curved-walkway.jpeg";
+import paverDrivewayInstallation from "../assets/imgs/services/paver-driveway-installation.jpeg";
+import paverInstallationTeam from "../assets/imgs/services/paver-installation-team.jpeg";
+import paversBeforeAfterQuincy from "../assets/imgs/services/pavers-before-after-quincy.jpeg";
+import walkwayFrontEntry from "../assets/imgs/services/walkway-front-entry.jpeg";
+import walkwayLinearGrayPavers from "../assets/imgs/services/walkway-linear-gray-pavers.jpeg";
 
 export type ServiceName =
   | "Pavers"
@@ -24,6 +33,8 @@ export interface InstagramPost {
 export interface Service {
   title: ServiceName;
   desc: string;
+  imageSrc: string;
+  imageAlt: string;
 }
 
 export interface NavItem {
@@ -86,38 +97,56 @@ export const SERVICES: Service[] = [
   {
     title: "Pavers",
     desc: "Expert installation of interlocking concrete and stone pavers.",
+    imageSrc: paversBeforeAfterQuincy,
+    imageAlt: "Before and after paver walkway renovation in Quincy, Massachusetts.",
   },
   {
     title: "Brick Work",
     desc: "Professional masonry for walls, chimneys, and structural needs.",
+    imageSrc: brickWalkwayBeforeAfterMilton,
+    imageAlt: "Before and after brick walkway restoration in Milton, Massachusetts.",
   },
   {
     title: "Walkways",
     desc: "Beautifully designed paths that add value to your property.",
+    imageSrc: walkwayFrontEntry,
+    imageAlt: "Finished front-entry walkway with pavers and dark border.",
   },
   {
     title: "Stone Walls",
     desc: "Robust and aesthetic natural stone retaining walls.",
+    imageSrc: paverDrivewayInstallation,
+    imageAlt: "Large paver installation area with stacked stone and border detailing.",
   },
   {
     title: "Excavation",
     desc: "Precision site clearing, grading, and earth moving.",
+    imageSrc: paverInstallationTeam,
+    imageAlt: "Contractor leveling a base during a paver installation project.",
   },
   {
     title: "Fences",
     desc: "Quality residential and commercial fencing solutions.",
+    imageSrc: backyardPaverPatioFence,
+    imageAlt: "Backyard patio paving project with a newly installed perimeter fence.",
   },
   {
     title: "Paint",
     desc: "High-end interior and exterior painting services to transform your home's look.",
+    imageSrc: paintedHouseCurvedWalkway,
+    imageAlt: "Freshly painted home exterior with a decorative curved stone walkway.",
   },
   {
     title: "Landscape",
     desc: "Full-service landscape design and maintenance to create your dream outdoor oasis.",
+    imageSrc: walkwayLinearGrayPavers,
+    imageAlt: "Long landscaped paver walkway crossing a front yard.",
   },
   {
     title: "Deck",
     desc: "Custom deck design and construction using premium materials built to last.",
+    imageSrc: deckPatioRenovation,
+    imageAlt: "Deck and patio renovation with new paving and graded soil.",
   },
 ];
 
