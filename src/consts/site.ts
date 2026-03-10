@@ -47,8 +47,8 @@ export interface AboutFeature {
   description: string;
 }
 
-export const PHONE_NUMBER = "+18572492409";
-export const DISPLAY_PHONE = "+1 (857) 249-2409";
+export const PHONE_NUMBER = "+17746882900";
+export const DISPLAY_PHONE = "+1 (774) 688-2900";
 export const DIRECT_SMS_PHONE = "+1 (774) 688-2900";
 export const LOCATION_LABEL = "Serving all of Boston, Massachusetts";
 
@@ -114,7 +114,7 @@ export const LOCAL_BUSINESS_SCHEMA = {
   "@type": "HomeAndConstructionBusiness",
   name: SITE_NAME,
   url: SITE_URL,
-  telephone: PHONE_NUMBER,
+  telephone: DIRECT_SMS_PHONE,
   image: `${SITE_URL}/og-image.jpg`,
   logo: `${SITE_URL}/logo.webp`,
   description:
