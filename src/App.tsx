@@ -1,7 +1,8 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
 import { PHONE_NUMBER, type ServiceName } from "./consts/site";
 import AppSeo from "./components/AppSeo";
+import AuthModal from "./components/auth/AuthModal";
 import MobileMenu from "./components/layout/MobileMenu";
 import SiteFooter from "./components/layout/SiteFooter";
 import SiteHeader from "./components/layout/SiteHeader";
@@ -9,6 +10,7 @@ import AboutSection from "./components/sections/AboutSection";
 import ContactSection from "./components/sections/ContactSection";
 import HeroSection from "./components/sections/HeroSection";
 import ServicesSection from "./components/sections/ServicesSection";
+import useAuthSession from "./hooks/useAuthSession";
 import useScrollThreshold from "./hooks/useScrollThreshold";
 import useToggle from "./hooks/useToggle";
 import {
@@ -26,6 +28,52 @@ const App = () => {
   const scrolled = useScrollThreshold(50);
   const { value: isMenuOpen, toggle: toggleMenu, setFalse: closeMenu } =
     useToggle(false);
+  const {
+    value: isAuthModalOpen,
+    setTrue: openAuthModal,
+    setFalse: closeAuthModal,
+  } = useToggle(false);
+  const {
+    session,
+    isLoading: isAuthLoading,
+    isSubmitting: isAuthSubmitting,
+    error: authError,
+    notice: authNotice,
+    setNotice: setAuthNotice,
+    login,
+    register,
+    logout,
+  } = useAuthSession();
+
+  useEffect(() => {
+    const currentUrl = new URL(window.location.href);
+    const authStatus = currentUrl.searchParams.get("auth");
+    const verifiedEmail = currentUrl.searchParams.get("email");
+
+    if (!authStatus) {
+      return;
+    }
+
+    if (authStatus === "verified") {
+      setAuthNotice(
+        verifiedEmail
+          ? `Email confirmed for ${verifiedEmail}. You can sign in now.`
+          : "Email confirmed. You can sign in now.",
+      );
+      openAuthModal();
+    }
+
+    if (authStatus === "verification-invalid") {
+      setAuthNotice(
+        "This verification link is invalid or has already expired. Request a new confirmation email.",
+      );
+      openAuthModal();
+    }
+
+    currentUrl.searchParams.delete("auth");
+    currentUrl.searchParams.delete("email");
+    window.history.replaceState({}, "", currentUrl.toString());
+  }, [openAuthModal, setAuthNotice]);
 
   const handleSmsRequest = useCallback((service?: ServiceName) => {
     const message = getSmsMessage(service);
@@ -45,16 +93,16 @@ const App = () => {
           scrolled={scrolled}
           isMenuOpen={isMenuOpen}
           onMenuToggle={toggleMenu}
-          onEstimateClick={handleSmsRequest}
+          onAuthClick={openAuthModal}
         />
 
         <MobileMenu
           isOpen={isMenuOpen}
           onClose={closeMenu}
-          onEstimateClick={handleSmsRequest}
+          onAuthClick={openAuthModal}
         />
 
-        <HeroSection onEstimateClick={handleSmsRequest} />
+        <HeroSection onAuthClick={openAuthModal} />
         <ServicesSection onServiceRequest={handleSmsRequest} />
         <AboutSection />
         <ContactSection
@@ -62,6 +110,19 @@ const App = () => {
           onCallClick={handleCallRequest}
         />
         <SiteFooter />
+
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          session={session}
+          isLoading={isAuthLoading}
+          isSubmitting={isAuthSubmitting}
+          error={authError}
+          notice={authNotice}
+          onClose={closeAuthModal}
+          onLogin={login}
+          onRegister={register}
+          onLogout={logout}
+        />
       </div>
     </>
   );

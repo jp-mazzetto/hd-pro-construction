@@ -8,10 +8,11 @@ interface ButtonProps {
   className?: string;
   variant?: ButtonVariant;
   type?: "button" | "submit" | "reset";
+  disabled?: boolean;
 }
 
 const baseStyles =
-  "px-6 py-4 rounded-md font-black uppercase tracking-tighter transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2";
+  "cursor-pointer flex items-center justify-center gap-2 rounded-md px-6 py-4 font-black uppercase tracking-tighter transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100 disabled:active:scale-100";
 
 const variants: Record<ButtonVariant, string> = {
   primary:
@@ -30,11 +31,13 @@ export default function Button({
   className = "",
   variant = "primary",
   type = "button",
+  disabled = false,
 }: ButtonProps) {
   return (
     <button
       type={type}
       onClick={onClick}
+      disabled={disabled}
       className={`${baseStyles} ${variants[variant]} ${className}`}
     >
       {children}

@@ -7,19 +7,19 @@ import Button from "../Button";
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  onEstimateClick: () => void;
+  onAuthClick: () => void;
 }
 
 /**
- * Overlay de navegacao mobile com links de secao e CTA de estimativa.
+ * Overlay de navegacao mobile com links de secao e CTA de acesso.
  */
-const MobileMenu = ({ isOpen, onClose, onEstimateClick }: MobileMenuProps) => {
+const MobileMenu = ({ isOpen, onClose, onAuthClick }: MobileMenuProps) => {
   if (!isOpen) {
     return null;
   }
 
-  const handleEstimateClick = () => {
-    onEstimateClick();
+  const handleAuthClick = () => {
+    onAuthClick();
     onClose();
   };
 
@@ -45,10 +45,10 @@ const MobileMenu = ({ isOpen, onClose, onEstimateClick }: MobileMenuProps) => {
         </a>
       ))}
       <Button
-        onClick={handleEstimateClick}
+        onClick={handleAuthClick}
         className="text-xl px-16 py-8 shadow-2xl shadow-orange-500/20"
       >
-        FREE ESTIMATE
+        LOGIN
       </Button>
     </div>
   );

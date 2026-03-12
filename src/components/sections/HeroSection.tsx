@@ -1,16 +1,16 @@
-import { MessageSquare, Phone } from "lucide-react";
+import { Phone, ShieldCheck } from "lucide-react";
 
 import { DISPLAY_PHONE, SERVICE_TAGS } from "../../consts/site";
 import Button from "../Button";
 
 interface HeroSectionProps {
-  onEstimateClick: () => void;
+  onAuthClick: () => void;
 }
 
 /**
- * Secao hero com proposta principal da marca e CTA para solicitar estimativa.
+ * Secao hero com proposta principal da marca e CTA principal de acesso.
  */
-const HeroSection = ({ onEstimateClick }: HeroSectionProps) => {
+const HeroSection = ({ onAuthClick }: HeroSectionProps) => {
   return (
     <header className="relative h-screen flex items-center overflow-hidden text-left">
       <div className="absolute inset-0 bg-gray-900">
@@ -42,12 +42,12 @@ const HeroSection = ({ onEstimateClick }: HeroSectionProps) => {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-6">
-            <Button onClick={onEstimateClick} className="text-xl py-6 px-12 group">
-              <MessageSquare
+            <Button onClick={onAuthClick} className="text-xl py-6 px-12 group">
+              <ShieldCheck
                 size={28}
                 className="group-hover:rotate-12 transition-transform"
               />
-              Text for Free Estimate
+              Login to Continue
             </Button>
             <div className="flex items-center gap-4 text-white">
               <div className="w-12 h-12 rounded-full border-2 border-white/20 flex items-center justify-center">

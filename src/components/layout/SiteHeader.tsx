@@ -8,7 +8,7 @@ interface SiteHeaderProps {
   scrolled: boolean;
   isMenuOpen: boolean;
   onMenuToggle: () => void;
-  onEstimateClick: () => void;
+  onAuthClick: () => void;
 }
 
 /**
@@ -18,7 +18,7 @@ const SiteHeader = ({
   scrolled,
   isMenuOpen,
   onMenuToggle,
-  onEstimateClick,
+  onAuthClick,
 }: SiteHeaderProps) => {
   return (
     <nav
@@ -38,11 +38,11 @@ const SiteHeader = ({
             </a>
           ))}
           <Button
-            onClick={onEstimateClick}
+            onClick={onAuthClick}
             variant={scrolled ? "primary" : "secondary"}
             className="py-3 px-6 text-[15px]"
           >
-            Free Estimate
+            Login
           </Button>
         </div>
 
