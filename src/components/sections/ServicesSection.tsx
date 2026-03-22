@@ -9,7 +9,9 @@ interface ServicesSectionProps {
 /**
  * Secao que lista os servicos da empresa com CTA por item.
  */
-const ServicesSection = ({ onServiceRequest }: ServicesSectionProps) => {
+const ServicesSection = ({
+  onServiceRequest,
+}: ServicesSectionProps) => {
   return (
     <section
       id="services"
@@ -43,6 +45,7 @@ const ServicesSection = ({ onServiceRequest }: ServicesSectionProps) => {
             />
           ))}
         </div>
+
       </div>
     </section>
   );

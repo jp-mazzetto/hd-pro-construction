@@ -1,6 +1,10 @@
 import { useCallback, useEffect } from "react";
 
-import { PHONE_NUMBER, type ServiceName } from "./consts/site";
+import {
+  PHONE_NUMBER,
+  type ServiceName,
+  type SubscriptionPlanName,
+} from "./consts/site";
 import AppSeo from "./components/AppSeo";
 import AuthModal from "./components/auth/AuthModal";
 import MobileMenu from "./components/layout/MobileMenu";
@@ -9,12 +13,14 @@ import SiteHeader from "./components/layout/SiteHeader";
 import AboutSection from "./components/sections/AboutSection";
 import ContactSection from "./components/sections/ContactSection";
 import HeroSection from "./components/sections/HeroSection";
+import PlansPromotionSection from "./components/sections/PlansPromotionSection";
 import ServicesSection from "./components/sections/ServicesSection";
 import useAuthSession from "./hooks/useAuthSession";
 import useScrollThreshold from "./hooks/useScrollThreshold";
 import useToggle from "./hooks/useToggle";
 import {
   createSmsHref,
+  getPlanSmsMessage,
   createTelHref,
   getSmsMessage,
   navigateToHref,
@@ -111,6 +117,11 @@ const App = () => {
     navigateToHref(createSmsHref(PHONE_NUMBER, message));
   }, []);
 
+  const handlePlanRequest = useCallback((planName: SubscriptionPlanName) => {
+    const message = getPlanSmsMessage(planName);
+    navigateToHref(createSmsHref(PHONE_NUMBER, message));
+  }, []);
+
   const handleCallRequest = useCallback(() => {
     navigateToHref(createTelHref(PHONE_NUMBER));
   }, []);
@@ -135,6 +146,7 @@ const App = () => {
 
         <HeroSection onAuthClick={openAuthModal} />
         <ServicesSection onServiceRequest={handleSmsRequest} />
+        <PlansPromotionSection onPlanRequest={handlePlanRequest} />
         <AboutSection />
         <ContactSection
           onEstimateClick={handleSmsRequest}

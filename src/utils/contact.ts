@@ -1,7 +1,9 @@
 import {
   DEFAULT_SMS_TEMPLATE,
+  PLAN_SMS_TEMPLATES,
   SMS_TEMPLATES,
   type ServiceName,
+  type SubscriptionPlanName,
 } from "../consts/site";
 
 /**
@@ -22,6 +24,17 @@ export const getSmsMessage = (service?: ServiceName): string => {
   }
 
   return SMS_TEMPLATES[service];
+};
+
+/**
+ * Retorna mensagem de SMS com intencao de contratar um plano de assinatura.
+ */
+export const getPlanSmsMessage = (planName?: SubscriptionPlanName): string => {
+  if (!planName) {
+    return DEFAULT_SMS_TEMPLATE;
+  }
+
+  return PLAN_SMS_TEMPLATES[planName];
 };
 
 /**

@@ -37,6 +37,17 @@ export interface Service {
   imageAlt: string;
 }
 
+export type SubscriptionPlanName = "Basic Plan" | "Standard Plan" | "Premium Plan";
+
+export interface SubscriptionPlanOffer {
+  tier: SubscriptionPlanName;
+  priceLabel: string;
+  maxSqFtLabel: string;
+  visitsLabel: string;
+  features: string[];
+  bestFor: string;
+}
+
 export interface NavItem {
   label: string;
   href: string;
@@ -285,6 +296,15 @@ export const SMS_TEMPLATES: Record<ServiceName, string> = {
 export const DEFAULT_SMS_TEMPLATE =
   "Hi HD Pro Construction, I saw your website and I'd like to request a free estimate.";
 
+export const PLAN_SMS_TEMPLATES: Record<SubscriptionPlanName, string> = {
+  "Basic Plan":
+    "Hi HD Pro Construction, I'd like to subscribe to the Basic Lawn Maintenance Plan ($100/month).",
+  "Standard Plan":
+    "Hi HD Pro Construction, I'd like to subscribe to the Standard Lawn Maintenance Plan ($140/month).",
+  "Premium Plan":
+    "Hi HD Pro Construction, I'd like to subscribe to the Premium Lawn Maintenance Plan ($180/month).",
+};
+
 export const SERVICES: Service[] = [
   {
     title: "Pavers",
@@ -381,3 +401,37 @@ export const ABOUT_FEATURES: AboutFeature[] = [
       "Licensed professionals with years of hard-won field experience.",
   },
 ];
+
+export const LAWN_MAINTENANCE_PLANS: SubscriptionPlanOffer[] = [
+  {
+    tier: "Basic Plan",
+    priceLabel: "$100/month",
+    maxSqFtLabel: "Up to 3,000 sq ft",
+    visitsLabel: "Biweekly mowing (2 visits per month)",
+    features: ["Lawn edging", "Yard cleanup"],
+    bestFor: "Perfect for small homes and townhouses.",
+  },
+  {
+    tier: "Standard Plan",
+    priceLabel: "$140/month",
+    maxSqFtLabel: "Up to 5,000 sq ft lawn",
+    visitsLabel: "Biweekly mowing",
+    features: ["Edging and trimming", "Yard cleanup"],
+    bestFor: "Ideal for medium-size properties.",
+  },
+  {
+    tier: "Premium Plan",
+    priceLabel: "$180/month",
+    maxSqFtLabel: "Up to 8,000 sq ft lawn",
+    visitsLabel: "Lawn mowing",
+    features: ["Full edging and trimming", "Yard cleanup and maintenance"],
+    bestFor: "Best for large properties.",
+  },
+];
+
+export const REFERRAL_PROMOTION = {
+  title: "Special Offer",
+  headline: "Refer 3 new customers and get 1 month of landscape free.",
+  helperText:
+    "Start your loyalty cycle now and unlock recurring maintenance savings.",
+};
