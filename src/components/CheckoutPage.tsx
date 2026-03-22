@@ -33,7 +33,7 @@ const CheckoutPage = ({ planTier, onBack }: CheckoutPageProps) => {
   if (planNotFound) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
-        <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 text-center shadow-2xl shadow-black/30">
+        <div className="rounded-3xl border border-white/10 bg-white/3 p-8 text-center shadow-2xl shadow-black/30">
           <p className="font-['Bebas_Neue'] text-4xl tracking-wide">Plan not found</p>
           <button
             type="button"
@@ -52,7 +52,7 @@ const CheckoutPage = ({ planTier, onBack }: CheckoutPageProps) => {
   if (!dbPlan && !isLoadingPlan) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
-        <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 text-center shadow-2xl shadow-black/30">
+        <div className="rounded-3xl border border-white/10 bg-white/3 p-8 text-center shadow-2xl shadow-black/30">
           <p className="font-['Bebas_Neue'] text-4xl tracking-wide">
             Unable to load plan
           </p>
@@ -101,7 +101,7 @@ const CheckoutPage = ({ planTier, onBack }: CheckoutPageProps) => {
           {/* Page title section */}
           <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
             <div>
-              <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-4 py-2 text-[11px] font-black uppercase tracking-[0.26em] text-orange-200">
+              <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/3 px-4 py-2 text-[11px] font-black uppercase tracking-[0.26em] text-orange-200">
                 <Sparkles size={14} />
                 Checkout flow
               </p>
@@ -117,7 +117,7 @@ const CheckoutPage = ({ planTier, onBack }: CheckoutPageProps) => {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-4 text-sm text-gray-300">
+            <div className="rounded-2xl border border-white/10 bg-white/4 px-5 py-4 text-sm text-gray-300">
               <p className="text-[10px] font-black uppercase tracking-[0.26em] text-gray-400">
                 Current step
               </p>
