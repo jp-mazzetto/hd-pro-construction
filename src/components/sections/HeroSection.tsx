@@ -26,7 +26,7 @@ const HeroSection = ({ onAuthClick }: HeroSectionProps) => {
             </span>
           </div>
 
-          <h1 className="text-6xl md:text-[120px] font-black text-white leading-[0.85] mb-8 uppercase italic tracking-tighter drop-shadow-2xl text-left">
+          <h1 className="text-5xl md:text-[120px] font-black text-white leading-[0.85] mb-8 uppercase italic tracking-tighter drop-shadow-2xl text-left">
             Transforming <br />
             <span className="text-orange-600">Outdoor</span> <br />
             Spaces

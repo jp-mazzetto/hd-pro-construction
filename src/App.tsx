@@ -119,7 +119,7 @@ const App = () => {
     <>
       <AppSeo />
 
-      <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-orange-600 selection:text-white">
+      <div className="min-h-screen overflow-x-hidden bg-white font-sans text-gray-900 selection:bg-orange-600 selection:text-white">
         <SiteHeader
           scrolled={scrolled}
           isMenuOpen={isMenuOpen}

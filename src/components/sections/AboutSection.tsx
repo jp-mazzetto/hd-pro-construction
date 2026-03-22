@@ -27,7 +27,7 @@ const AboutSection = () => {
         />
 
         <div className="text-left">
-          <h2 className="text-5xl md:text-7xl font-black uppercase italic mb-10 leading-none">
+          <h2 className="text-4xl md:text-7xl font-black uppercase italic mb-10 leading-none">
             Quality Built <br />
             <span className="text-orange-600">On Experience</span>
           </h2>
@@ -51,12 +51,12 @@ const AboutSection = () => {
             ))}
           </div>
 
-          <div className="mt-16 p-8 bg-gray-800/50 rounded-2xl border-l-4 border-orange-600 flex items-center justify-between text-left">
+          <div className="mt-16 p-6 md:p-8 bg-gray-800/50 rounded-2xl border-l-4 border-orange-600 flex items-center justify-between gap-4 text-left">
             <div>
               <p className="text-xs font-black uppercase tracking-widest text-orange-600 mb-1">
                 Follow Us
               </p>
-              <p className="text-xl font-black italic tracking-tighter">
+              <p className="text-base md:text-xl font-black italic tracking-tighter break-all md:break-normal">
                 @hd_pro_construction_inc
               </p>
             </div>
