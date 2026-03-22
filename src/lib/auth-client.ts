@@ -76,6 +76,8 @@ export const registerWithEmail = (input: RegisterInput) =>
     body: JSON.stringify(input),
   });
 
+export const getGoogleAuthStartUrl = () => `${API_BASE_URL}/api/auth/google/start`;
+
 export const logoutCurrentSession = () =>
   request<void>("/api/auth/logout", {
     method: "POST",

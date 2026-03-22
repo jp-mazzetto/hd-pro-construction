@@ -42,6 +42,7 @@ const App = () => {
     setNotice: setAuthNotice,
     login,
     register,
+    continueWithGoogle,
     logout,
   } = useAuthSession();
 
@@ -66,6 +67,36 @@ const App = () => {
     if (authStatus === "verification-invalid") {
       setAuthNotice(
         "This verification link is invalid or has already expired. Request a new confirmation email.",
+      );
+      openAuthModal();
+    }
+
+    if (authStatus === "google-success") {
+      setAuthNotice("Signed in with Google.");
+      openAuthModal();
+    }
+
+    if (authStatus === "google-email-unverified") {
+      setAuthNotice(
+        "Your Google account email is not verified. Please use a verified Google account.",
+      );
+      openAuthModal();
+    }
+
+    if (authStatus === "google-account-inactive") {
+      setAuthNotice("This account is inactive.");
+      openAuthModal();
+    }
+
+    if (
+      authStatus === "google-failed" ||
+      authStatus === "google-invalid-state" ||
+      authStatus === "google-token-exchange-failed" ||
+      authStatus === "google-missing-email" ||
+      authStatus === "google-unconfigured"
+    ) {
+      setAuthNotice(
+        "Google sign-in could not be completed right now. Please try again.",
       );
       openAuthModal();
     }
@@ -121,6 +152,7 @@ const App = () => {
           onClose={closeAuthModal}
           onLogin={login}
           onRegister={register}
+          onGoogleAuthStart={continueWithGoogle}
           onLogout={logout}
         />
       </div>

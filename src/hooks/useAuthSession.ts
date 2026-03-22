@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import {
   ApiError,
   fetchCurrentSession,
+  getGoogleAuthStartUrl,
   loginWithEmail,
   registerWithEmail,
   logoutCurrentSession,
@@ -133,6 +134,10 @@ export default function useAuthSession() {
     }
   };
 
+  const continueWithGoogle = () => {
+    window.location.assign(getGoogleAuthStartUrl());
+  };
+
   return {
     session,
     isLoading,
@@ -142,6 +147,7 @@ export default function useAuthSession() {
     setNotice,
     login,
     register,
+    continueWithGoogle,
     logout,
   };
 }

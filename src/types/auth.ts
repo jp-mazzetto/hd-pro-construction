@@ -8,7 +8,6 @@ export interface AuthActor {
 }
 
 export interface AuthSession {
-  sessionId: string;
   expiresAt: string;
   actor: AuthActor;
 }
