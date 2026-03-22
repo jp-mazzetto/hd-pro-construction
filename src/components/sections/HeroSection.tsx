@@ -15,13 +15,13 @@ const HeroSection = ({ onAuthClick }: HeroSectionProps) => {
     <header className="relative h-screen flex items-center overflow-hidden text-left">
       <div className="absolute inset-0 bg-gray-900">
         <div className="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=2070')] bg-cover bg-center"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-gray-900 via-gray-900/40 to-transparent"></div>
       </div>
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-4xl">
-          <div className="inline-block bg-orange-600 text-white font-black px-4 py-1 mb-8 italic skew-x-[-12deg] animate-fade-in uppercase tracking-widest text-sm text-left">
-            <span className="inline-block skew-x-[12deg]">
+          <div className="inline-block bg-orange-600 text-white font-black px-4 py-1 mb-8 italic -skew-x-12 animate-fade-in uppercase tracking-widest text-sm text-left">
+            <span className="inline-block skew-x-12">
               Professional Excellence
             </span>
           </div>
