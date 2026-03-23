@@ -63,6 +63,10 @@ export const DISPLAY_PHONE = "+1 (774) 688-2900";
 export const DIRECT_SMS_PHONE = "+1 (774) 688-2900";
 export const LOCATION_LABEL = "Serving all of Boston, Massachusetts";
 
+// ── Instagram ───────────────────────────────────────────────────────────────────
+
+export const instagramProfileUrl = "https://www.instagram.com/hd_pro_construction_inc/";
+
 // ── SEO ──────────────────────────────────────────────────────────────────────
 
 export const SITE_URL = "https://hdproconstruction.com";
@@ -156,7 +160,7 @@ export const LOCAL_BUSINESS_SCHEMA = {
     { "@type": "City", name: "Needham" },
     { "@type": "State", name: "Massachusetts" },
   ],
-  sameAs: ["https://www.instagram.com/hd_pro_construction_inc/"],
+  sameAs: [instagramProfileUrl],
   priceRange: "$$",
   openingHoursSpecification: [
     {

@@ -1,10 +1,8 @@
 import { CheckCircle, Instagram } from "lucide-react";
 
-import { ABOUT_FEATURES, IG_POSTS } from "../../consts/site";
+import { ABOUT_FEATURES, IG_POSTS, instagramProfileUrl } from "../../consts/site";
 import useCarousel from "../../hooks/useCarousel";
 import InstagramCarousel from "./InstagramCarousel";
-
-const instagramProfileUrl = "https://www.instagram.com/hd_pro_construction_inc/";
 
 /**
  * Secao institucional com prova social (Instagram) e diferenciais da empresa.

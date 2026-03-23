@@ -5,7 +5,7 @@ import {
   Instagram,
 } from "lucide-react";
 
-import type { InstagramPost } from "../../consts/site";
+import { instagramProfileUrl, type InstagramPost } from "../../consts/site";
 
 interface InstagramCarouselProps {
   posts: InstagramPost[];
@@ -14,8 +14,6 @@ interface InstagramCarouselProps {
   onNextSlide: () => void;
   onSelectSlide: (index: number) => void;
 }
-
-const instagramProfileUrl = "https://www.instagram.com/hd_pro_construction_inc/";
 
 /**
  * Carrossel de posts do Instagram com navegacao manual e indicador de slide.

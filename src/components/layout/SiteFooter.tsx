@@ -3,12 +3,11 @@ import { Instagram, MapPin, MessageSquare, Phone } from "lucide-react";
 import {
   DIRECT_SMS_PHONE,
   DISPLAY_PHONE,
+  instagramProfileUrl,
   LOCATION_LABEL,
   NAV_ITEMS,
 } from "../../consts/site";
 import BrandLogo from "../BrandLogo";
-
-const instagramProfileUrl = "https://www.instagram.com/hd_pro_construction_inc/";
 
 /**
  * Rodape institucional com dados de contato, links de navegacao e rede social.
