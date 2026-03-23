@@ -170,7 +170,7 @@ export const CheckoutForm = ({
                         <textarea
                             value={form.notes}
                             onChange={(e) => handleFieldChange("notes", e.target.value)}
-                            className={`${getInputClass(Boolean(fieldErrors.notes))} min-h-[112px] resize-none`}
+                            className={`${getInputClass(Boolean(fieldErrors.notes))} min-h-28 resize-none`}
                             placeholder="Gate code, preferred service window, access details..."
                             rows={3}
                             maxLength={500}
@@ -183,7 +183,7 @@ export const CheckoutForm = ({
                     <button
                         type="submit"
                         disabled={isSubmitting || isLoadingPlan || !isPlanLoaded}
-                        className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-400 px-6 py-4 text-sm font-black uppercase tracking-[0.24em] text-white shadow-xl shadow-orange-900/35 transition-all hover:from-orange-400 hover:to-orange-300 hover:text-gray-950 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-orange-500 to-orange-400 px-6 py-4 text-sm font-black uppercase tracking-[0.24em] text-white shadow-xl shadow-orange-900/35 transition-all hover:from-orange-400 hover:to-orange-300 hover:text-gray-950 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         {isSubmitting ? (
                             <>

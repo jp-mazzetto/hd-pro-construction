@@ -12,7 +12,7 @@ export const PlanSummary = ({ plan }: PlanSummaryProps) => {
     return (
         <aside className="order-2 lg:order-1">
             <div className="sticky top-6 overflow-hidden rounded-3xl border border-white/15 bg-black/30 shadow-2xl shadow-black/35 backdrop-blur-xl">
-                <div className="border-b border-white/10 bg-gradient-to-r from-orange-500/25 via-orange-400/10 to-transparent px-6 py-4">
+                <div className="border-b border-white/10 bg-linear-to-r from-orange-500/25 via-orange-400/10 to-transparent px-6 py-4">
                     <p className="text-[10px] font-black uppercase tracking-[0.32em] text-orange-200">
                         Selected plan
                     </p>

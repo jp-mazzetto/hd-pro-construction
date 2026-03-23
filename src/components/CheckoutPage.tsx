@@ -73,8 +73,8 @@ const CheckoutPage = ({ planTier, onBack }: CheckoutPageProps) => {
     <div className="relative min-h-screen overflow-hidden bg-slate-950 text-white">
       {/* Background effects */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_8%,rgba(249,115,22,0.2),transparent_28%),radial-gradient(circle_at_90%_16%,rgba(255,255,255,0.08),transparent_20%),linear-gradient(180deg,#090b12_0%,#0c111f_100%)]" />
-      <div className="pointer-events-none absolute top-20 left-[-140px] h-80 w-80 rounded-full bg-orange-500/20 blur-[120px]" />
-      <div className="pointer-events-none absolute right-[-140px] bottom-[-80px] h-96 w-96 rounded-full bg-blue-500/10 blur-[140px]" />
+      <div className="pointer-events-none absolute top-20 -left-35 h-80 w-80 rounded-full bg-orange-500/20 blur-[120px]" />
+      <div className="pointer-events-none absolute -right-35 -bottom-20 h-96 w-96 rounded-full bg-blue-500/10 blur-[140px]" />
 
       {/* Header */}
       <div className="relative border-b border-white/10 bg-black/30 backdrop-blur-xl">
