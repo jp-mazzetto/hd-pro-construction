@@ -54,6 +54,7 @@ export default function DashboardLayout({
         currentSection={currentSection}
         onNavigate={handleNavigate}
         onGoHome={onGoHome}
+        isAdmin={session.actor.role === "ADMIN"}
         className="hidden lg:flex w-60 shrink-0"
       />
 
@@ -70,6 +71,7 @@ export default function DashboardLayout({
             currentSection={currentSection}
             onNavigate={handleNavigate}
             onGoHome={onGoHome}
+            isAdmin={session.actor.role === "ADMIN"}
             className="fixed inset-y-0 left-0 z-50 w-60 lg:hidden"
           />
         </>

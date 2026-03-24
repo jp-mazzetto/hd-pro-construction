@@ -36,7 +36,7 @@ export const ReferralPromotionCard = ({
 
       <button
         type="button"
-        className="inline-flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-lg bg-orange-500 px-8 py-4 font-bold text-gray-950 shadow-xl transition-transform duration-200 hover:scale-105 active:scale-95"
+        className="inline-flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-lg bg-orange-700 px-8 py-4 font-bold text-orange-50 shadow-xl transition-transform duration-200 hover:scale-105 hover:bg-orange-800 active:scale-95"
       >
         <ArrowRightLeft size={18} />
         Invite Your Neighbors

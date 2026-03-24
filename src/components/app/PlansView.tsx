@@ -80,7 +80,7 @@ const PlansView = ({
               </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:items-stretch">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:items-center">
               {LAWN_MAINTENANCE_PLANS.map((plan) => (
                 <PlanCard
                   key={plan.tier}

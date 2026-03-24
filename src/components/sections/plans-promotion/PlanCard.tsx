@@ -34,17 +34,17 @@ export const PlanCard = ({
     <article
       className={`relative flex flex-col justify-between overflow-hidden p-10 transition-transform duration-300 ${
         isFeatured
-          ? "z-10 bg-gray-800 shadow-2xl ring-1 ring-amber-400/20 md:scale-105"
-          : "bg-gray-800/40 hover:bg-gray-800/70"
+          ? "z-10 bg-gray-800 shadow-2xl ring-1 ring-orange-300/35 md:min-h-[37rem] md:scale-105"
+          : "bg-gray-800/40 hover:bg-gray-800/70 md:min-h-[35rem]"
       }`}
     >
       {isCurrentPlan ? (
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 rounded-b-full bg-orange-500 px-5 py-1.5 text-[0.6rem] font-extrabold uppercase tracking-widest text-white">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 rounded-b-full bg-orange-700 px-5 py-1.5 text-[0.6rem] font-extrabold uppercase tracking-widest text-orange-50">
           Current Plan
         </div>
       ) : (
         isFeatured && (
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 rounded-b-full bg-orange-500 px-5 py-1.5 text-[0.6rem] font-extrabold uppercase tracking-widest text-gray-950">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 rounded-b-full bg-orange-700 px-5 py-1.5 text-[0.6rem] font-extrabold uppercase tracking-widest text-orange-50">
             Recommended
           </div>
         )
@@ -58,7 +58,7 @@ export const PlanCard = ({
         <h3 className="mt-6 text-3xl font-bold text-white">{plan.tier}</h3>
 
         <div className="mb-10 mt-2 flex items-baseline gap-1">
-          <span className="text-4xl font-bold text-amber-400">{price}</span>
+          <span className="text-4xl font-bold text-orange-300">{price}</span>
           <span className="text-sm font-medium uppercase text-gray-400">/month</span>
         </div>
 
@@ -83,8 +83,8 @@ export const PlanCard = ({
           isCurrentPlan
             ? "cursor-not-allowed border border-white/15 bg-white/5 text-gray-400"
             : isFeatured
-              ? "cursor-pointer bg-amber-400 text-gray-950 shadow-lg hover:opacity-90"
-              : "cursor-pointer border border-gray-700 text-white hover:border-amber-400 hover:bg-amber-400 hover:text-gray-950"
+              ? "cursor-pointer bg-orange-300 text-slate-950 shadow-lg hover:bg-orange-200"
+              : "cursor-pointer border border-gray-700 text-white hover:border-orange-300 hover:bg-orange-300 hover:text-slate-950"
         }`}
       >
         {getPlanCtaLabel({ planTier: plan.tier, hasSubscription, isStandard, isCurrentPlan })}
@@ -106,7 +106,7 @@ const PlanFeatureItem = ({ value, isFeatured }: PlanFeatureItemProps) => (
   <li className="flex items-center gap-3 text-gray-300">
     <CheckCircle
       size={18}
-      className={isFeatured ? "text-orange-400" : "text-amber-400/70"}
+      className={isFeatured ? "text-orange-400" : "text-orange-300/80"}
       fill={isFeatured ? "currentColor" : "none"}
       strokeWidth={isFeatured ? 0 : 2}
     />
