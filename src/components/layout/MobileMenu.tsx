@@ -6,14 +6,16 @@ import Button from "../Button";
 
 interface MobileMenuProps {
   isOpen: boolean;
+  isAuthenticated: boolean;
   onClose: () => void;
   onAuthClick: () => void;
+  onDashboardClick: () => void;
 }
 
 /**
  * Overlay de navegacao mobile com links de secao e CTA de acesso.
  */
-const MobileMenu = ({ isOpen, onClose, onAuthClick }: MobileMenuProps) => {
+const MobileMenu = ({ isOpen, isAuthenticated, onClose, onAuthClick, onDashboardClick }: MobileMenuProps) => {
   if (!isOpen) {
     return null;
   }
@@ -45,10 +47,16 @@ const MobileMenu = ({ isOpen, onClose, onAuthClick }: MobileMenuProps) => {
         </a>
       ))}
       <Button
-        onClick={handleAuthClick}
+        onClick={() => {
+          if (isAuthenticated) {
+            onDashboardClick();
+          } else {
+            handleAuthClick();
+          }
+        }}
         className="text-xl px-16 py-8 shadow-2xl shadow-orange-500/20"
       >
-        LOGIN
+        {isAuthenticated ? "MY ACCOUNT" : "LOGIN"}
       </Button>
     </div>
   );

@@ -7,8 +7,10 @@ import Button from "../Button";
 interface SiteHeaderProps {
   scrolled: boolean;
   isMenuOpen: boolean;
+  isAuthenticated: boolean;
   onMenuToggle: () => void;
   onAuthClick: () => void;
+  onDashboardClick: () => void;
 }
 
 /**
@@ -17,8 +19,10 @@ interface SiteHeaderProps {
 const SiteHeader = ({
   scrolled,
   isMenuOpen,
+  isAuthenticated,
   onMenuToggle,
   onAuthClick,
+  onDashboardClick,
 }: SiteHeaderProps) => {
   return (
     <nav
@@ -38,11 +42,11 @@ const SiteHeader = ({
             </a>
           ))}
           <Button
-            onClick={onAuthClick}
+            onClick={isAuthenticated ? onDashboardClick : onAuthClick}
             variant={scrolled ? "primary" : "secondary"}
             className="py-3 px-6 text-[15px]"
           >
-            Login
+            {isAuthenticated ? "My Account" : "Login"}
           </Button>
         </div>
 

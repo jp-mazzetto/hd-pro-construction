@@ -1,58 +1,23 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
-import {
-  PHONE_NUMBER,
-  type ServiceName,
-  type SubscriptionPlanName,
-} from "./consts/site";
-import AppSeo from "./components/AppSeo";
-import AuthModal from "./components/auth/AuthModal";
-import CheckoutPage from "./components/CheckoutPage";
-import CheckoutResult from "./components/CheckoutResult";
-import MobileMenu from "./components/layout/MobileMenu";
-import SiteFooter from "./components/layout/SiteFooter";
-import SiteHeader from "./components/layout/SiteHeader";
-import AboutSection from "./components/sections/AboutSection";
-import ContactSection from "./components/sections/ContactSection";
-import HeroSection from "./components/sections/HeroSection";
-import PlansPromotionSection from "./components/sections/PlansPromotionSection";
-import ServicesSection from "./components/sections/ServicesSection";
+import { PHONE_NUMBER, type SubscriptionPlanName } from "./consts/site";
+import AppAuthModal from "./components/app/AppAuthModal";
+import CheckoutView from "./components/app/CheckoutView";
+import DashboardView from "./components/app/DashboardView";
+import HomeView from "./components/app/HomeView";
+import useAppNavigation from "./hooks/useAppNavigation";
 import useAuthSession from "./hooks/useAuthSession";
+import useAuthUrlEffects from "./hooks/useAuthUrlEffects";
+import useCheckoutSessionVerification from "./hooks/useCheckoutSessionVerification";
+import useContactActions from "./hooks/useContactActions";
+import useDashboardAuthGuard from "./hooks/useDashboardAuthGuard";
 import useScrollThreshold from "./hooks/useScrollThreshold";
 import useToggle from "./hooks/useToggle";
-import {
-  createSmsHref,
-  createTelHref,
-  getSmsMessage,
-  navigateToHref,
-} from "./utils/contact";
-
-const PLAN_NAME_TO_TIER: Record<SubscriptionPlanName, string> = {
-  "Basic Plan": "basic",
-  "Standard Plan": "standard",
-  "Premium Plan": "premium",
-};
-
-type CurrentPage =
-  | { kind: "home" }
-  | { kind: "checkout"; planTier: string }
-  | { kind: "checkout-result"; status: "success" | "cancel" };
-
-const resolveInitialPage = (): CurrentPage => {
-  const path = window.location.pathname;
-  if (path === "/success") return { kind: "checkout-result", status: "success" };
-  if (path === "/cancel") return { kind: "checkout-result", status: "cancel" };
-  if (path === "/checkout") {
-    const params = new URLSearchParams(window.location.search);
-    const plan = params.get("plan");
-    if (plan) return { kind: "checkout", planTier: plan };
-  }
-  return { kind: "home" };
-};
+import { getPlanTierByName } from "./utils/navigation";
 
 /**
  * Componente raiz da aplicação, responsável por orquestrar layout, navegação
- * mobile e ações de contato (SMS/ligação).
+ * e autenticação entre home, checkout e dashboard.
  */
 const App = () => {
   const scrolled = useScrollThreshold(50);
@@ -76,104 +41,46 @@ const App = () => {
     logout,
   } = useAuthSession();
 
-  const [page, setPage] = useState<CurrentPage>(resolveInitialPage);
+  const isAuthenticated = Boolean(session);
+  const {
+    page,
+    currentPage,
+    isDashboardBlockedByAuth,
+    navigateToHome,
+    navigateToCheckout,
+    navigateToDashboard,
+  } = useAppNavigation({
+    isAuthLoading,
+    isAuthenticated,
+  });
+
   const [pendingPlan, setPendingPlan] = useState<SubscriptionPlanName | null>(null);
+  const { requestSmsContact, requestCallContact } = useContactActions(PHONE_NUMBER);
 
-  const navigateToHome = useCallback(() => {
-    setPage({ kind: "home" });
-    window.history.replaceState({}, "", "/");
-  }, []);
+  useAuthUrlEffects({
+    session,
+    isAuthLoading,
+    openAuthModal,
+    setAuthNotice,
+  });
 
-  const navigateToCheckout = useCallback((tier: string) => {
-    setPage({ kind: "checkout", planTier: tier });
-    window.history.replaceState({}, "", `/checkout?plan=${tier}`);
-    window.scrollTo(0, 0);
-  }, []);
+  useCheckoutSessionVerification({
+    page,
+    session,
+  });
 
-  // Wrap login to redirect to checkout after successful auth
-  const handleLogin = useCallback(
-    async (input: Parameters<typeof login>[0]) => {
-      const didLogin = await login(input);
-      if (didLogin && pendingPlan) {
-        const tier = PLAN_NAME_TO_TIER[pendingPlan];
-        setPendingPlan(null);
-        closeAuthModal();
-        navigateToCheckout(tier);
-      }
-      return didLogin;
-    },
-    [login, pendingPlan, closeAuthModal, navigateToCheckout],
-  );
+  useDashboardAuthGuard({
+    isDashboardBlockedByAuth,
+    onBlockedByAuth: openAuthModal,
+  });
 
-
-  useEffect(() => {
-    const currentUrl = new URL(window.location.href);
-    const authStatus = currentUrl.searchParams.get("auth");
-    const verifiedEmail = currentUrl.searchParams.get("email");
-
-    if (!authStatus) {
-      return;
-    }
-
-    if (authStatus === "verified") {
-      setAuthNotice(
-        verifiedEmail
-          ? `Email confirmed for ${verifiedEmail}. You can sign in now.`
-          : "Email confirmed. You can sign in now.",
-      );
-      openAuthModal();
-    }
-
-    if (authStatus === "verification-invalid") {
-      setAuthNotice(
-        "This verification link is invalid or has already expired. Request a new confirmation email.",
-      );
-      openAuthModal();
-    }
-
-    if (authStatus === "google-success") {
-      setAuthNotice("Signed in with Google.");
-      openAuthModal();
-    }
-
-    if (authStatus === "google-email-unverified") {
-      setAuthNotice(
-        "Your Google account email is not verified. Please use a verified Google account.",
-      );
-      openAuthModal();
-    }
-
-    if (authStatus === "google-account-inactive") {
-      setAuthNotice("This account is inactive.");
-      openAuthModal();
-    }
-
-    if (
-      authStatus === "google-failed" ||
-      authStatus === "google-invalid-state" ||
-      authStatus === "google-token-exchange-failed" ||
-      authStatus === "google-missing-email" ||
-      authStatus === "google-unconfigured"
-    ) {
-      setAuthNotice(
-        "Google sign-in could not be completed right now. Please try again.",
-      );
-      openAuthModal();
-    }
-
-    currentUrl.searchParams.delete("auth");
-    currentUrl.searchParams.delete("email");
-    window.history.replaceState({}, "", currentUrl.toString());
-  }, [openAuthModal, setAuthNotice]);
-
-  const handleSmsRequest = useCallback((service?: ServiceName) => {
-    const message = getSmsMessage(service);
-    navigateToHref(createSmsHref(PHONE_NUMBER, message));
-  }, []);
+  const handleDashboardNavigation = useCallback(() => {
+    navigateToDashboard("overview");
+  }, [navigateToDashboard]);
 
   const handlePlanRequest = useCallback(
     (planName: SubscriptionPlanName) => {
-      const tier = PLAN_NAME_TO_TIER[planName];
+      const tier = getPlanTierByName(planName);
 
       if (session) {
         navigateToCheckout(tier);
@@ -186,91 +93,107 @@ const App = () => {
     [session, navigateToCheckout, openAuthModal],
   );
 
-  const handleCallRequest = useCallback(() => {
-    navigateToHref(createTelHref(PHONE_NUMBER));
-  }, []);
+  const handleLogin = useCallback(
+    async (input: Parameters<typeof login>[0]) => {
+      const didLogin = await login(input);
 
-  // Checkout page (full-page, no header/footer from home)
-  if (page.kind === "checkout") {
+      if (!didLogin) {
+        return false;
+      }
+
+      closeAuthModal();
+
+      if (pendingPlan) {
+        navigateToCheckout(getPlanTierByName(pendingPlan));
+        setPendingPlan(null);
+      } else {
+        navigateToDashboard("overview");
+      }
+
+      return true;
+    },
+    [login, closeAuthModal, pendingPlan, navigateToCheckout, navigateToDashboard],
+  );
+
+  const checkoutResultScheduleSetup = useMemo(() => {
+    if (currentPage.kind !== "checkout-result") {
+      return undefined;
+    }
+
+    if (currentPage.status !== "success") {
+      return undefined;
+    }
+
+    if (!session) {
+      return undefined;
+    }
+
+    return () => navigateToDashboard("overview");
+  }, [currentPage, session, navigateToDashboard]);
+
+  const authModal = (
+    <AppAuthModal
+      isOpen={isAuthModalOpen}
+      session={session}
+      isAuthLoading={isAuthLoading}
+      isAuthSubmitting={isAuthSubmitting}
+      authError={authError}
+      authNotice={authNotice}
+      onClose={closeAuthModal}
+      onLogin={handleLogin}
+      onRegister={register}
+      onGoogleAuthStart={continueWithGoogle}
+      onLogout={logout}
+    />
+  );
+
+  if (currentPage.kind === "dashboard") {
     return (
       <>
-        <AppSeo />
-        <div className="min-h-screen overflow-x-hidden font-sans text-gray-900 selection:bg-orange-600 selection:text-white">
-          <CheckoutPage planTier={page.planTier} onBack={navigateToHome} />
+        <DashboardView
+          session={session}
+          isAuthLoading={isAuthLoading}
+          section={currentPage.section}
+          params={currentPage.params}
+          onNavigate={navigateToDashboard}
+          onGoHome={navigateToHome}
+          onLogout={logout}
+        />
+        {authModal}
+      </>
+    );
+  }
 
-          <AuthModal
-            isOpen={isAuthModalOpen}
-            session={session}
-            isLoading={isAuthLoading}
-            isSubmitting={isAuthSubmitting}
-            error={authError}
-            notice={authNotice}
-            onClose={closeAuthModal}
-            onLogin={handleLogin}
-            onRegister={register}
-            onGoogleAuthStart={continueWithGoogle}
-            onLogout={logout}
-          />
-        </div>
+  if (currentPage.kind === "checkout") {
+    return (
+      <>
+        <CheckoutView planTier={currentPage.planTier} onBack={navigateToHome} />
+        {authModal}
       </>
     );
   }
 
   return (
     <>
-      <AppSeo />
-
-      <div className="min-h-screen overflow-x-hidden bg-white font-sans text-gray-900 selection:bg-orange-600 selection:text-white">
-        <SiteHeader
-          scrolled={scrolled}
-          isMenuOpen={isMenuOpen}
-          onMenuToggle={toggleMenu}
-          onAuthClick={openAuthModal}
-        />
-
-        <MobileMenu
-          isOpen={isMenuOpen}
-          onClose={closeMenu}
-          onAuthClick={openAuthModal}
-        />
-
-        <HeroSection onAuthClick={openAuthModal} />
-        <ServicesSection onServiceRequest={handleSmsRequest} />
-        {!isAuthLoading && (
-          <PlansPromotionSection
-            onPlanRequest={handlePlanRequest}
-            isAuthenticated={Boolean(session)}
-            showPlans={!session}
-          />
-        )}
-        <AboutSection />
-        <ContactSection
-          onEstimateClick={handleSmsRequest}
-          onCallClick={handleCallRequest}
-        />
-        <SiteFooter />
-
-        <AuthModal
-          isOpen={isAuthModalOpen}
-          session={session}
-          isLoading={isAuthLoading}
-          isSubmitting={isAuthSubmitting}
-          error={authError}
-          notice={authNotice}
-          onClose={closeAuthModal}
-          onLogin={handleLogin}
-          onRegister={register}
-          onGoogleAuthStart={continueWithGoogle}
-          onLogout={logout}
-        />
-
-        {page.kind === "checkout-result" && (
-          <CheckoutResult
-            status={page.status}
-            onClose={navigateToHome}
-          />
-        )}
-      </div>
+      <HomeView
+        scrolled={scrolled}
+        isMenuOpen={isMenuOpen}
+        isAuthLoading={isAuthLoading}
+        isAuthenticated={isAuthenticated}
+        checkoutResultStatus={
+          currentPage.kind === "checkout-result" ? currentPage.status : undefined
+        }
+        onMenuToggle={toggleMenu}
+        onMenuClose={closeMenu}
+        onAuthClick={openAuthModal}
+        onDashboardClick={handleDashboardNavigation}
+        onServiceRequest={requestSmsContact}
+        onPlanRequest={handlePlanRequest}
+        onCallRequest={requestCallContact}
+        onCheckoutResultClose={navigateToHome}
+        onCheckoutResultScheduleSetup={checkoutResultScheduleSetup}
+      />
+      {authModal}
     </>
   );
 };

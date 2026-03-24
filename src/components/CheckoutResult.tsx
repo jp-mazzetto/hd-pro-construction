@@ -3,9 +3,10 @@ import { CheckCircle, XCircle } from "lucide-react";
 interface CheckoutResultProps {
   status: "success" | "cancel";
   onClose: () => void;
+  onScheduleSetup?: () => void;
 }
 
-const CheckoutResult = ({ status, onClose }: CheckoutResultProps) => {
+const CheckoutResult = ({ status, onClose, onScheduleSetup }: CheckoutResultProps) => {
   const isSuccess = status === "success";
 
   return (
@@ -25,21 +26,40 @@ const CheckoutResult = ({ status, onClose }: CheckoutResultProps) => {
 
         <p className="mt-3 text-gray-600">
           {isSuccess
-            ? "Your lawn maintenance plan is now active. We'll reach out shortly to schedule your first visit."
+            ? "Your lawn maintenance plan is now active. Set up your preferred schedule to get started."
             : "Your checkout was cancelled and no charges were made. You can subscribe anytime from the plans section."}
         </p>
 
-        <button
-          type="button"
-          onClick={onClose}
-          className={`mt-8 w-full cursor-pointer py-4 font-bold transition-all ${
-            isSuccess
-              ? "bg-amber-400 text-gray-950 hover:opacity-90"
-              : "border border-gray-300 text-gray-900 hover:bg-gray-100"
-          }`}
-        >
-          {isSuccess ? "Got It" : "Back to Plans"}
-        </button>
+        {isSuccess && onScheduleSetup ? (
+          <div className="mt-8 space-y-3">
+            <button
+              type="button"
+              onClick={onScheduleSetup}
+              className="w-full cursor-pointer bg-amber-400 py-4 font-bold text-gray-950 transition-all hover:opacity-90"
+            >
+              Set Up My Schedule
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full cursor-pointer border border-gray-300 py-3 text-sm font-semibold text-gray-600 transition-all hover:bg-gray-100"
+            >
+              I'll do this later
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={onClose}
+            className={`mt-8 w-full cursor-pointer py-4 font-bold transition-all ${
+              isSuccess
+                ? "bg-amber-400 text-gray-950 hover:opacity-90"
+                : "border border-gray-300 text-gray-900 hover:bg-gray-100"
+            }`}
+          >
+            {isSuccess ? "Got It" : "Back to Plans"}
+          </button>
+        )}
       </div>
     </div>
   );
