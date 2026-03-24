@@ -175,7 +175,7 @@ export default function VisitCalendarPage() {
               onClick={goToday}
               className="rounded-lg border border-orange-500/40 bg-orange-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-orange-300 hover:bg-orange-500/20 cursor-pointer print:hidden"
             >
-              Today
+              Go to Today
             </button>
           )}
         </div>

@@ -3,9 +3,7 @@ import {
   CreditCard,
   LayoutDashboard,
   Settings,
-  Shield,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 import type { DashboardSection } from "../../types/dashboard";
 
@@ -26,7 +24,6 @@ interface DashboardSidebarProps {
   currentSection: DashboardSection;
   onNavigate: (section: DashboardSection) => void;
   onGoHome: () => void;
-  isAdmin?: boolean;
   className?: string;
 }
 
@@ -34,10 +31,8 @@ export default function DashboardSidebar({
   currentSection,
   onNavigate,
   onGoHome,
-  isAdmin = false,
   className = "",
 }: DashboardSidebarProps) {
-  const navigate = useNavigate();
   return (
     <aside
       className={`dashboard-sidebar flex flex-col border-r border-slate-800 ${className}`}
@@ -95,21 +90,6 @@ export default function DashboardSidebar({
           );
         })}
       </nav>
-
-      {isAdmin && (
-        <div className="mx-3 mb-2">
-          <button
-            type="button"
-            onClick={() => void navigate("/admin")}
-            className="group flex w-full items-center gap-3 rounded-xl border border-orange-500/30 bg-orange-500/10 px-3 py-3 text-left text-xs font-bold uppercase tracking-[0.14em] text-orange-300 hover:border-orange-500/50 hover:bg-orange-500/15 cursor-pointer"
-          >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-500/20 text-orange-300">
-              <Shield size={16} />
-            </span>
-            <span className="truncate">Admin Panel</span>
-          </button>
-        </div>
-      )}
 
       <div className="m-3 rounded-xl border border-slate-800 bg-slate-900/75 px-3 py-2.5">
         <p className="text-[11px] uppercase tracking-[0.14em] text-slate-500">System Status</p>

@@ -5,16 +5,23 @@ import useAuth from "../hooks/useAuth";
 
 const ProtectedLayout = () => {
   const navigate = useNavigate();
-  const { isAuthLoading, isAuthenticated, openAuthModal } = useAuth();
+  const { isAuthLoading, isAuthenticated, session, openAuthModal } = useAuth();
 
   useEffect(() => {
-    if (isAuthLoading || isAuthenticated) {
+    if (isAuthLoading) {
       return;
     }
 
-    openAuthModal();
-    void navigate("/", { replace: true });
-  }, [isAuthLoading, isAuthenticated, openAuthModal, navigate]);
+    if (!isAuthenticated) {
+      openAuthModal();
+      void navigate("/", { replace: true });
+      return;
+    }
+
+    if (session?.actor.role === "ADMIN") {
+      void navigate("/admin", { replace: true });
+    }
+  }, [isAuthLoading, isAuthenticated, session, openAuthModal, navigate]);
 
   return <Outlet />;
 };

@@ -1,4 +1,4 @@
-import { ArrowLeft, LogOut, Shield } from "lucide-react";
+import { Home, LogOut, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import type { AuthSession } from "../../types/auth";
@@ -23,11 +23,11 @@ export default function AdminTopBar({ session, onLogout }: AdminTopBarProps) {
       <div className="flex items-center gap-3">
         <button
           type="button"
-          onClick={() => void navigate("/dashboard")}
+          onClick={() => void navigate("/")}
           className="flex items-center gap-1.5 rounded-xl border border-slate-700 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-300 hover:border-slate-500 hover:bg-slate-900 cursor-pointer"
         >
-          <ArrowLeft size={14} />
-          <span className="hidden sm:inline">Dashboard</span>
+          <Home size={14} />
+          <span className="hidden sm:inline">Home</span>
         </button>
 
         <div className="flex items-center gap-2">
