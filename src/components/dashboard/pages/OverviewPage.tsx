@@ -50,9 +50,13 @@ const INITIAL_FORM: PropertyFormData = {
 
 interface OverviewPageProps {
   onNavigate: (section: DashboardSection, params?: Record<string, string>) => void;
+  onNavigateToPlans: () => void;
 }
 
-export default function OverviewPage({ onNavigate }: OverviewPageProps) {
+export default function OverviewPage({
+  onNavigate,
+  onNavigateToPlans,
+}: OverviewPageProps) {
   const [subscriptions, setSubscriptions] = useState<UserSubscription[]>([]);
   const [visits, setVisits] = useState<ServiceVisit[]>([]);
   const [referral, setReferral] = useState<ReferralStatus | null>(null);
@@ -236,12 +240,13 @@ export default function OverviewPage({ onNavigate }: OverviewPageProps) {
         {subscriptions.length === 0 ? (
           <div className="rounded-xl border border-slate-800 bg-slate-900 p-6 text-center">
             <p className="mb-3 text-sm text-slate-400">No plans yet.</p>
-            <a
-              href="/#plans"
-              className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-sm font-bold text-white hover:bg-orange-700"
+            <button
+              type="button"
+              onClick={onNavigateToPlans}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-sm font-bold text-white hover:bg-orange-700"
             >
               <Plus size={16} /> Choose a Plan
-            </a>
+            </button>
           </div>
         ) : (
           <div className="space-y-3">

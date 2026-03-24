@@ -6,13 +6,18 @@ import {
   instagramProfileUrl,
   LOCATION_LABEL,
   NAV_ITEMS,
+  type NavItem,
 } from "../../consts/site";
 import BrandLogo from "../BrandLogo";
+
+interface SiteFooterProps {
+  navItems?: NavItem[];
+}
 
 /**
  * Rodape institucional com dados de contato, links de navegacao e rede social.
  */
-const SiteFooter = () => {
+const SiteFooter = ({ navItems = NAV_ITEMS }: SiteFooterProps) => {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -42,7 +47,7 @@ const SiteFooter = () => {
               Navigation
             </h4>
             <ul className="space-y-4 text-gray-400 font-black uppercase text-xs tracking-widest">
-              {NAV_ITEMS.map((item) => (
+              {navItems.map((item) => (
                 <li key={item.href}>
                   <a
                     href={item.href}

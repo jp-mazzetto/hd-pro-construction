@@ -1,12 +1,13 @@
 import { X } from "lucide-react";
 
-import { NAV_ITEMS } from "../../consts/site";
+import { NAV_ITEMS, type NavItem } from "../../consts/site";
 import BrandLogo from "../BrandLogo";
 import Button from "../Button";
 
 interface MobileMenuProps {
   isOpen: boolean;
   isAuthenticated: boolean;
+  navItems?: NavItem[];
   onClose: () => void;
   onAuthClick: () => void;
   onDashboardClick: () => void;
@@ -15,7 +16,14 @@ interface MobileMenuProps {
 /**
  * Overlay de navegacao mobile com links de secao e CTA de acesso.
  */
-const MobileMenu = ({ isOpen, isAuthenticated, onClose, onAuthClick, onDashboardClick }: MobileMenuProps) => {
+const MobileMenu = ({
+  isOpen,
+  isAuthenticated,
+  navItems = NAV_ITEMS,
+  onClose,
+  onAuthClick,
+  onDashboardClick,
+}: MobileMenuProps) => {
   if (!isOpen) {
     return null;
   }
@@ -36,7 +44,7 @@ const MobileMenu = ({ isOpen, isAuthenticated, onClose, onAuthClick, onDashboard
         <X size={48} />
       </button>
       <BrandLogo light className="scale-150 mb-10" />
-      {NAV_ITEMS.map((item) => (
+      {navItems.map((item) => (
         <a
           key={item.href}
           href={item.href}

@@ -9,9 +9,13 @@ import EmptyState from "../shared/EmptyState";
 
 interface SubscriptionsPageProps {
   onNavigate: (section: DashboardSection, params?: Record<string, string>) => void;
+  onNavigateToPlans: () => void;
 }
 
-export default function SubscriptionsPage({ onNavigate }: SubscriptionsPageProps) {
+export default function SubscriptionsPage({
+  onNavigate,
+  onNavigateToPlans,
+}: SubscriptionsPageProps) {
   const [subscriptions, setSubscriptions] = useState<UserSubscription[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,12 +59,13 @@ export default function SubscriptionsPage({ onNavigate }: SubscriptionsPageProps
         title="No Plans Yet"
         description="Subscribe to a lawn maintenance plan to get started with regular service."
         action={
-          <a
-            href="/#plans"
-            className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-700"
+          <button
+            type="button"
+            onClick={onNavigateToPlans}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-orange-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-700"
           >
             <Plus size={16} /> Choose a Plan
-          </a>
+          </button>
         }
       />
     );

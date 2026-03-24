@@ -22,7 +22,7 @@ export const STATUS_META: Record<
 > = {
   ACTIVE: {
     label: "Active",
-    className: "border-lime-400/40 bg-lime-500/15 text-lime-300",
+    className: "border-orange-400/40 bg-orange-500/15 text-orange-300",
   },
   PENDING: {
     label: "Pending Payment",

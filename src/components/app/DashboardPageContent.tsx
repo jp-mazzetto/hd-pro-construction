@@ -16,6 +16,7 @@ interface DashboardPageContentProps {
   section: DashboardSection;
   params?: DashboardRouteParams;
   onNavigate: NavigateToDashboard;
+  onNavigateToPlans: () => void;
 }
 
 const DashboardPageContent = ({
@@ -23,12 +24,18 @@ const DashboardPageContent = ({
   section,
   params,
   onNavigate,
+  onNavigateToPlans,
 }: DashboardPageContentProps) => {
   switch (section) {
     case "overview":
-      return <OverviewPage onNavigate={onNavigate} />;
+      return <OverviewPage onNavigate={onNavigate} onNavigateToPlans={onNavigateToPlans} />;
     case "subscriptions":
-      return <SubscriptionsPage onNavigate={onNavigate} />;
+      return (
+        <SubscriptionsPage
+          onNavigate={onNavigate}
+          onNavigateToPlans={onNavigateToPlans}
+        />
+      );
     case "subscription-detail":
       return (
         <SubscriptionDetailPage
@@ -54,7 +61,7 @@ const DashboardPageContent = ({
     case "settings":
       return <SettingsPage session={session} onSessionUpdate={() => {}} />;
     default:
-      return <OverviewPage onNavigate={onNavigate} />;
+      return <OverviewPage onNavigate={onNavigate} onNavigateToPlans={onNavigateToPlans} />;
   }
 };
 

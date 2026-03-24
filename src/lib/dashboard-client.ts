@@ -205,8 +205,18 @@ export const updateProfile = (input: UpdateProfileInput) =>
     body: JSON.stringify(input),
   });
 
-export const changePassword = (input: { currentPassword: string; newPassword: string }) =>
-  request<{ message: string }>("/api/auth/me/change-password", {
+export type ChangePasswordInput = {
+  currentPassword?: string;
+  newPassword: string;
+};
+
+export type ChangePasswordResponse = {
+  kind: "password_set" | "password_changed";
+  message: string;
+};
+
+export const changePassword = (input: ChangePasswordInput) =>
+  request<ChangePasswordResponse>("/api/auth/me/change-password", {
     method: "POST",
     body: JSON.stringify(input),
   });

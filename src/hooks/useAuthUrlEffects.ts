@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import type { AuthSession } from "../types/auth";
 
@@ -23,12 +24,13 @@ const useAuthUrlEffects = ({
   openAuthModal,
   setAuthNotice,
 }: UseAuthUrlEffectsOptions) => {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const pendingGoogleRedirect = useRef(false);
 
   useEffect(() => {
-    const currentUrl = new URL(window.location.href);
-    const authStatus = currentUrl.searchParams.get("auth");
-    const verifiedEmail = currentUrl.searchParams.get("email");
+    const authStatus = searchParams.get("auth");
+    const verifiedEmail = searchParams.get("email");
 
     if (!authStatus) {
       return;
@@ -63,10 +65,13 @@ const useAuthUrlEffects = ({
       openAuthModal();
     }
 
-    currentUrl.searchParams.delete("auth");
-    currentUrl.searchParams.delete("email");
-    window.history.replaceState({}, "", currentUrl.toString());
-  }, [openAuthModal, setAuthNotice]);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete("auth");
+      next.delete("email");
+      return next;
+    }, { replace: true });
+  }, [openAuthModal, setAuthNotice, searchParams, setSearchParams]);
 
   useEffect(() => {
     if (isAuthLoading || !session || !pendingGoogleRedirect.current) {
@@ -74,8 +79,8 @@ const useAuthUrlEffects = ({
     }
 
     pendingGoogleRedirect.current = false;
-    window.location.replace("/dashboard");
-  }, [isAuthLoading, session]);
+    void navigate("/dashboard", { replace: true });
+  }, [isAuthLoading, session, navigate]);
 };
 
 export default useAuthUrlEffects;

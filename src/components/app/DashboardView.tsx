@@ -11,6 +11,7 @@ interface DashboardViewProps {
   section: DashboardSection;
   params?: DashboardRouteParams;
   onNavigate: NavigateToDashboard;
+  onNavigateToPlans: () => void;
   onGoHome: () => void;
   onLogout: () => Promise<void>;
 }
@@ -21,6 +22,7 @@ const DashboardView = ({
   section,
   params,
   onNavigate,
+  onNavigateToPlans,
   onGoHome,
   onLogout,
 }: DashboardViewProps) => {
@@ -52,6 +54,7 @@ const DashboardView = ({
           section={section}
           params={params}
           onNavigate={onNavigate}
+          onNavigateToPlans={onNavigateToPlans}
         />
       </DashboardLayout>
     </>

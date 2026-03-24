@@ -263,6 +263,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Services", href: "#services" },
   { label: "About", href: "#about" },
   { label: "Contact", href: "#contact" },
+  { label: "Plans", href: "/plans" },
 ];
 
 export const SERVICE_TAGS: string[] = [

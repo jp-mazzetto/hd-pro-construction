@@ -44,7 +44,7 @@ export const PlanCard = ({
         </div>
       ) : (
         isFeatured && (
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 rounded-b-full bg-lime-500 px-5 py-1.5 text-[0.6rem] font-extrabold uppercase tracking-widest text-gray-950">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 rounded-b-full bg-orange-500 px-5 py-1.5 text-[0.6rem] font-extrabold uppercase tracking-widest text-gray-950">
             Recommended
           </div>
         )
@@ -106,7 +106,7 @@ const PlanFeatureItem = ({ value, isFeatured }: PlanFeatureItemProps) => (
   <li className="flex items-center gap-3 text-gray-300">
     <CheckCircle
       size={18}
-      className={isFeatured ? "text-lime-400" : "text-amber-400/70"}
+      className={isFeatured ? "text-orange-400" : "text-amber-400/70"}
       fill={isFeatured ? "currentColor" : "none"}
       strokeWidth={isFeatured ? 0 : 2}
     />

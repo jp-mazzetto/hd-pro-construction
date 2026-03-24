@@ -1,6 +1,6 @@
 import { Menu, X } from "lucide-react";
 
-import { NAV_ITEMS } from "../../consts/site";
+import { NAV_ITEMS, type NavItem } from "../../consts/site";
 import BrandLogo from "../BrandLogo";
 import Button from "../Button";
 
@@ -8,6 +8,7 @@ interface SiteHeaderProps {
   scrolled: boolean;
   isMenuOpen: boolean;
   isAuthenticated: boolean;
+  navItems?: NavItem[];
   onMenuToggle: () => void;
   onAuthClick: () => void;
   onDashboardClick: () => void;
@@ -20,6 +21,7 @@ const SiteHeader = ({
   scrolled,
   isMenuOpen,
   isAuthenticated,
+  navItems = NAV_ITEMS,
   onMenuToggle,
   onAuthClick,
   onDashboardClick,
@@ -32,7 +34,7 @@ const SiteHeader = ({
         <BrandLogo light={!scrolled} className="w-auto h-auto" />
 
         <div className="hidden lg:flex gap-10 font-black uppercase text-xs tracking-[0.2em] items-center text-left">
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <a
               key={item.href}
               href={item.href}

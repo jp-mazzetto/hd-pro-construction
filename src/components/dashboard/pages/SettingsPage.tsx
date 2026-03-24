@@ -23,11 +23,14 @@ export default function SettingsPage({ session, onSessionUpdate }: SettingsPageP
   const [identities, setIdentities] = useState<AuthIdentityView[]>([]);
 
   // Password
+  const [accountHasPassword, setAccountHasPassword] = useState(
+    session.actor.hasPassword,
+  );
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [passwordSuccessMessage, setPasswordSuccessMessage] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -37,6 +40,10 @@ export default function SettingsPage({ session, onSessionUpdate }: SettingsPageP
       .then((data) => setIdentities(data.identities))
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    setAccountHasPassword(session.actor.hasPassword);
+  }, [session.actor.hasPassword]);
 
   const handleSaveProfile = useCallback(
     async (e: React.FormEvent) => {
@@ -69,7 +76,7 @@ export default function SettingsPage({ session, onSessionUpdate }: SettingsPageP
     async (e: React.FormEvent) => {
       e.preventDefault();
       setPasswordError(null);
-      setPasswordSuccess(false);
+      setPasswordSuccessMessage(null);
 
       if (newPassword.length < 8) {
         setPasswordError("New password must be at least 8 characters.");
@@ -81,24 +88,37 @@ export default function SettingsPage({ session, onSessionUpdate }: SettingsPageP
         return;
       }
 
+      if (accountHasPassword && currentPassword.trim().length === 0) {
+        setPasswordError("Current password is required.");
+        return;
+      }
+
       setIsChangingPassword(true);
 
       try {
-        await changePassword({ currentPassword, newPassword });
-        setPasswordSuccess(true);
+        const result = await changePassword({
+          currentPassword: accountHasPassword ? currentPassword : undefined,
+          newPassword,
+        });
+        setPasswordSuccessMessage(
+          result.kind === "password_set"
+            ? "Password set successfully."
+            : "Password changed successfully.",
+        );
+        setAccountHasPassword(true);
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
-        setTimeout(() => setPasswordSuccess(false), 3000);
+        setTimeout(() => setPasswordSuccessMessage(null), 3000);
       } catch (err) {
         const message =
-          err instanceof Error ? err.message : "Failed to change password.";
+          err instanceof Error ? err.message : "Failed to update password.";
         setPasswordError(message);
       } finally {
         setIsChangingPassword(false);
       }
     },
-    [currentPassword, newPassword, confirmPassword],
+    [accountHasPassword, currentPassword, newPassword, confirmPassword],
   );
 
   return (
@@ -152,31 +172,39 @@ export default function SettingsPage({ session, onSessionUpdate }: SettingsPageP
         className="rounded-xl border border-slate-800 bg-slate-900 p-5 space-y-4"
       >
         <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-400">
-          <KeyRound size={16} /> Change Password
+          <KeyRound size={16} /> {accountHasPassword ? "Change Password" : "Set Password"}
         </h3>
 
-        <div>
-          <label htmlFor="currentPassword" className="mb-1 block text-xs font-semibold text-slate-500">
-            Current Password
-          </label>
-          <div className="relative">
-            <input
-              id="currentPassword"
-              type={showCurrentPassword ? "text" : "password"}
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              required
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 pr-10 text-sm text-white placeholder:text-slate-500 focus:border-orange-500 focus:outline-none"
-            />
-            <button
-              type="button"
-              onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 cursor-pointer"
-            >
-              {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-            </button>
+        {!accountHasPassword && (
+          <p className="text-xs text-slate-500">
+            Set a local password to enable future sign in with email and password.
+          </p>
+        )}
+
+        {accountHasPassword && (
+          <div>
+            <label htmlFor="currentPassword" className="mb-1 block text-xs font-semibold text-slate-500">
+              Current Password
+            </label>
+            <div className="relative">
+              <input
+                id="currentPassword"
+                type={showCurrentPassword ? "text" : "password"}
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                required
+                className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 pr-10 text-sm text-white placeholder:text-slate-500 focus:border-orange-500 focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 cursor-pointer"
+              >
+                {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         <div>
           <label htmlFor="newPassword" className="mb-1 block text-xs font-semibold text-slate-500">
@@ -218,14 +246,18 @@ export default function SettingsPage({ session, onSessionUpdate }: SettingsPageP
         </div>
 
         {passwordError && <p className="text-sm text-red-400">{passwordError}</p>}
-        {passwordSuccess && <p className="text-sm text-emerald-400">Password changed successfully.</p>}
+        {passwordSuccessMessage && (
+          <p className="text-sm text-emerald-400">{passwordSuccessMessage}</p>
+        )}
 
         <button
           type="submit"
           disabled={isChangingPassword}
           className="rounded-lg bg-orange-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-700 disabled:opacity-50 cursor-pointer"
         >
-          {isChangingPassword ? "Changing..." : "Change Password"}
+          {isChangingPassword
+            ? (accountHasPassword ? "Changing..." : "Setting...")
+            : (accountHasPassword ? "Change Password" : "Set Password")}
         </button>
       </form>
 
@@ -246,8 +278,14 @@ export default function SettingsPage({ session, onSessionUpdate }: SettingsPageP
                 <div className="text-xs text-slate-400">{session.actor.email}</div>
               </div>
             </div>
-            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-bold text-emerald-400">
-              Active
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs font-bold ${
+                accountHasPassword
+                  ? "bg-emerald-500/15 text-emerald-400"
+                  : "bg-amber-500/15 text-amber-300"
+              }`}
+            >
+              {accountHasPassword ? "Active" : "Not configured"}
             </span>
           </div>
 

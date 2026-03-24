@@ -5,6 +5,7 @@ export interface AuthActor {
   name: string;
   email: string;
   role: UserRole;
+  hasPassword: boolean;
 }
 
 export interface AuthSession {
