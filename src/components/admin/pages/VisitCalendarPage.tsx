@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   CalendarDays,
   ChevronLeft,
@@ -61,8 +61,11 @@ export default function VisitCalendarPage() {
   const [notesModal, setNotesModal] = useState<{ visitId: string; current: string } | null>(null);
   const [notesText, setNotesText] = useState("");
 
-  const weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekStart.getDate() + 5);
+  const weekEnd = useMemo(() => {
+    const end = new Date(weekStart);
+    end.setDate(weekStart.getDate() + 5);
+    return end;
+  }, [weekStart]);
 
   const loadCalendar = useCallback(async () => {
     setIsLoading(true);
@@ -78,7 +81,7 @@ export default function VisitCalendarPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [weekStart]);
+  }, [weekStart, weekEnd]);
 
   useEffect(() => {
     void loadCalendar();
@@ -98,14 +101,18 @@ export default function VisitCalendarPage() {
     try {
       await completeVisit(id);
       void loadCalendar();
-    } catch {}
+    } catch(err) {
+      console.log(err)
+    }
   };
 
   const handleSkip = async (id: string) => {
     try {
       await skipVisit(id);
       void loadCalendar();
-    } catch {}
+    } catch(err) {
+      console.log(err)
+    }
   };
 
   const handleSaveNotes = async () => {
@@ -114,7 +121,9 @@ export default function VisitCalendarPage() {
       await updateVisitNotes(notesModal.visitId, notesText);
       setNotesModal(null);
       void loadCalendar();
-    } catch {}
+    } catch(err) {
+      console.log(err)
+    }
   };
 
   const openNotesModal = (visit: AdminCalendarVisit) => {
