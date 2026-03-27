@@ -19,4 +19,4 @@ If you are developing a production application, we recommend using TypeScript wi
 
 This project uses `VITE_API_BASE_URL` in production. The configured backend URL is:
 
-`https://hd-pro-construction-api-production.up.railway.app`
+`https://api.hdproconstruction.com`
