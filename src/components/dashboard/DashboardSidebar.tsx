@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 
 import type { DashboardSection } from "../../types/dashboard";
+import logoImg from "../../assets/imgs/logo.webp";
 
 interface NavItem {
   section: DashboardSection;
@@ -42,13 +43,16 @@ export default function DashboardSidebar({
           type="button"
           onClick={onGoHome}
           className="group flex items-center gap-3 cursor-pointer"
+          aria-label="Go to home page"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-orange-500/40 bg-orange-500/10 text-lg font-black text-orange-300 shadow-[0_10px_24px_rgba(249,115,22,0.28)]">
-            HD
+          <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border border-orange-500/40 bg-slate-900 shadow-[0_10px_24px_rgba(249,115,22,0.2)]">
+            <img
+              src={logoImg}
+              alt="HD Pro Construction logo"
+              className="h-full w-full object-cover"
+            />
           </span>
-          <span className="font-['Bebas_Neue'] text-3xl tracking-[0.1em] text-white">
-            PRO<span className="text-orange-400">CARE</span>
-          </span>
+          <span className="sr-only">HD Pro Construction</span>
         </button>
         <p className="mt-3 text-[11px] uppercase tracking-[0.18em] text-slate-500">
           Control Center

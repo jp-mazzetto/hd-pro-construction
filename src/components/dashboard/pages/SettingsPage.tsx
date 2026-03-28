@@ -122,144 +122,146 @@ export default function SettingsPage({ session, onSessionUpdate }: SettingsPageP
   );
 
   return (
-    <div className="max-w-xl space-y-6">
-      {/* Profile */}
-      <form
-        onSubmit={handleSaveProfile}
-        className="rounded-xl border border-slate-800 bg-slate-900 p-5 space-y-4"
-      >
-        <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-400">
-          <User size={16} /> Profile
-        </h3>
-
-        <div>
-          <label htmlFor="name" className="mb-1 block text-xs font-semibold text-slate-500">
-            Name
-          </label>
-          <input
-            id="name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            minLength={2}
-            className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-orange-500 focus:outline-none"
-          />
-        </div>
-
-        <div>
-          <label className="mb-1 block text-xs font-semibold text-slate-500">Email</label>
-          <div className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800/50 px-3 py-2.5 text-sm text-slate-400">
-            <Mail size={14} />
-            {session.actor.email}
-          </div>
-        </div>
-
-        {profileError && <p className="text-sm text-red-400">{profileError}</p>}
-        {saveSuccess && <p className="text-sm text-emerald-400">Profile updated.</p>}
-
-        <button
-          type="submit"
-          disabled={isSaving}
-          className="rounded-lg bg-orange-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-700 disabled:opacity-50 cursor-pointer"
+    <div className="w-full max-w-5xl space-y-6">
+      <div className="grid gap-6 [grid-template-columns:repeat(auto-fit,minmax(320px,1fr))]">
+        {/* Profile */}
+        <form
+          onSubmit={handleSaveProfile}
+          className="rounded-xl border border-slate-800 bg-slate-900 p-5 space-y-4"
         >
-          {isSaving ? "Saving..." : "Save Changes"}
-        </button>
-      </form>
+          <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-400">
+            <User size={16} /> Profile
+          </h3>
 
-      {/* Change Password */}
-      <form
-        onSubmit={handleChangePassword}
-        className="rounded-xl border border-slate-800 bg-slate-900 p-5 space-y-4"
-      >
-        <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-400">
-          <KeyRound size={16} /> {accountHasPassword ? "Change Password" : "Set Password"}
-        </h3>
-
-        {!accountHasPassword && (
-          <p className="text-xs text-slate-500">
-            Set a local password to enable future sign in with email and password.
-          </p>
-        )}
-
-        {accountHasPassword && (
           <div>
-            <label htmlFor="currentPassword" className="mb-1 block text-xs font-semibold text-slate-500">
-              Current Password
+            <label htmlFor="name" className="mb-1 block text-xs font-semibold text-slate-500">
+              Name
+            </label>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              minLength={2}
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-orange-500 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-xs font-semibold text-slate-500">Email</label>
+            <div className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800/50 px-3 py-2.5 text-sm text-slate-400">
+              <Mail size={14} />
+              {session.actor.email}
+            </div>
+          </div>
+
+          {profileError && <p className="text-sm text-red-400">{profileError}</p>}
+          {saveSuccess && <p className="text-sm text-emerald-400">Profile updated.</p>}
+
+          <button
+            type="submit"
+            disabled={isSaving}
+            className="rounded-lg bg-orange-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-700 disabled:opacity-50 cursor-pointer"
+          >
+            {isSaving ? "Saving..." : "Save Changes"}
+          </button>
+        </form>
+
+        {/* Change Password */}
+        <form
+          onSubmit={handleChangePassword}
+          className="rounded-xl border border-slate-800 bg-slate-900 p-5 space-y-4"
+        >
+          <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-400">
+            <KeyRound size={16} /> {accountHasPassword ? "Change Password" : "Set Password"}
+          </h3>
+
+          {!accountHasPassword && (
+            <p className="text-xs text-slate-500">
+              Set a local password to enable future sign in with email and password.
+            </p>
+          )}
+
+          {accountHasPassword && (
+            <div>
+              <label htmlFor="currentPassword" className="mb-1 block text-xs font-semibold text-slate-500">
+                Current Password
+              </label>
+              <div className="relative">
+                <input
+                  id="currentPassword"
+                  type={showCurrentPassword ? "text" : "password"}
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  required
+                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 pr-10 text-sm text-white placeholder:text-slate-500 focus:border-orange-500 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 cursor-pointer"
+                >
+                  {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div>
+            <label htmlFor="newPassword" className="mb-1 block text-xs font-semibold text-slate-500">
+              New Password
             </label>
             <div className="relative">
               <input
-                id="currentPassword"
-                type={showCurrentPassword ? "text" : "password"}
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
+                id="newPassword"
+                type={showNewPassword ? "text" : "password"}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
                 required
+                minLength={8}
                 className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 pr-10 text-sm text-white placeholder:text-slate-500 focus:border-orange-500 focus:outline-none"
               />
               <button
                 type="button"
-                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                onClick={() => setShowNewPassword(!showNewPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 cursor-pointer"
               >
-                {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
-        )}
 
-        <div>
-          <label htmlFor="newPassword" className="mb-1 block text-xs font-semibold text-slate-500">
-            New Password
-          </label>
-          <div className="relative">
+          <div>
+            <label htmlFor="confirmPassword" className="mb-1 block text-xs font-semibold text-slate-500">
+              Confirm New Password
+            </label>
             <input
-              id="newPassword"
-              type={showNewPassword ? "text" : "password"}
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
               minLength={8}
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 pr-10 text-sm text-white placeholder:text-slate-500 focus:border-orange-500 focus:outline-none"
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-orange-500 focus:outline-none"
             />
-            <button
-              type="button"
-              onClick={() => setShowNewPassword(!showNewPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 cursor-pointer"
-            >
-              {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-            </button>
           </div>
-        </div>
 
-        <div>
-          <label htmlFor="confirmPassword" className="mb-1 block text-xs font-semibold text-slate-500">
-            Confirm New Password
-          </label>
-          <input
-            id="confirmPassword"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            minLength={8}
-            className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-orange-500 focus:outline-none"
-          />
-        </div>
+          {passwordError && <p className="text-sm text-red-400">{passwordError}</p>}
+          {passwordSuccessMessage && (
+            <p className="text-sm text-emerald-400">{passwordSuccessMessage}</p>
+          )}
 
-        {passwordError && <p className="text-sm text-red-400">{passwordError}</p>}
-        {passwordSuccessMessage && (
-          <p className="text-sm text-emerald-400">{passwordSuccessMessage}</p>
-        )}
-
-        <button
-          type="submit"
-          disabled={isChangingPassword}
-          className="rounded-lg bg-orange-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-700 disabled:opacity-50 cursor-pointer"
-        >
-          {isChangingPassword
-            ? (accountHasPassword ? "Changing..." : "Setting...")
-            : (accountHasPassword ? "Change Password" : "Set Password")}
-        </button>
-      </form>
+          <button
+            type="submit"
+            disabled={isChangingPassword}
+            className="rounded-lg bg-orange-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-700 disabled:opacity-50 cursor-pointer"
+          >
+            {isChangingPassword
+              ? (accountHasPassword ? "Changing..." : "Setting...")
+              : (accountHasPassword ? "Change Password" : "Set Password")}
+          </button>
+        </form>
+      </div>
 
       {/* Auth Methods */}
       <div className="rounded-xl border border-slate-800 bg-slate-900 p-5">

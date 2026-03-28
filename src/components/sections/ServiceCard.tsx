@@ -39,7 +39,7 @@ const ServiceCard = ({ service, onRequest }: ServiceCardProps) => {
 
         <button
           type="button"
-          className="mt-7 inline-flex w-fit items-center gap-2 rounded-full border border-orange-400/40 bg-orange-600/10 px-5 py-2 text-[11px] font-black uppercase tracking-[0.2em] text-orange-200 transition-all duration-300 group-hover:bg-orange-600 group-hover:text-white hover:gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
+          className="mt-7 inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-orange-400/40 bg-orange-600/10 px-5 py-2 text-[11px] font-black uppercase tracking-[0.2em] text-orange-200 transition-all duration-300 group-hover:bg-orange-600 group-hover:text-white hover:gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
           onClick={() => onRequest(service.title)}
         >
           Book Now <ChevronRight size={16} />
