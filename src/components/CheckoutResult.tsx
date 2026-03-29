@@ -2,12 +2,19 @@ import { CheckCircle, XCircle } from "lucide-react";
 
 interface CheckoutResultProps {
   status: "success" | "cancel";
+  hasLinkedProperty?: boolean | null;
   onClose: () => void;
   onScheduleSetup?: () => void;
 }
 
-const CheckoutResult = ({ status, onClose, onScheduleSetup }: CheckoutResultProps) => {
+const CheckoutResult = ({
+  status,
+  hasLinkedProperty,
+  onClose,
+  onScheduleSetup,
+}: CheckoutResultProps) => {
   const isSuccess = status === "success";
+  const isReadyForSchedule = hasLinkedProperty === true;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm">
@@ -26,7 +33,9 @@ const CheckoutResult = ({ status, onClose, onScheduleSetup }: CheckoutResultProp
 
         <p className="mt-3 text-gray-600">
           {isSuccess
-            ? "Your plan payment is confirmed. Now link this plan to one of your addresses to finish setup."
+            ? isReadyForSchedule
+              ? "Your payment is confirmed and your address is already linked. Set up your service schedule to finish."
+              : "Your payment is confirmed. Link this plan to one of your addresses to finish setup."
             : "Your checkout was cancelled and no charges were made. You can subscribe anytime from the plans section."}
         </p>
 
@@ -37,7 +46,7 @@ const CheckoutResult = ({ status, onClose, onScheduleSetup }: CheckoutResultProp
               onClick={onScheduleSetup}
               className="w-full cursor-pointer bg-amber-400 py-4 font-bold text-gray-950 transition-all hover:opacity-90"
             >
-              Link Address Now
+              {isReadyForSchedule ? "Set Up Schedule" : "Link Address Now"}
             </button>
             <button
               type="button"

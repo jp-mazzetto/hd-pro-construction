@@ -16,6 +16,7 @@ interface HomeViewProps {
   isAuthLoading: boolean;
   isAuthenticated: boolean;
   checkoutResultStatus?: "success" | "cancel";
+  checkoutResultHasLinkedProperty?: boolean | null;
   onMenuToggle: () => void;
   onMenuClose: () => void;
   onAuthClick: () => void;
@@ -33,6 +34,7 @@ const HomeView = ({
   isAuthLoading,
   isAuthenticated,
   checkoutResultStatus,
+  checkoutResultHasLinkedProperty,
   onMenuToggle,
   onMenuClose,
   onAuthClick,
@@ -82,6 +84,7 @@ const HomeView = ({
       {checkoutResultStatus && (
         <CheckoutResult
           status={checkoutResultStatus}
+          hasLinkedProperty={checkoutResultHasLinkedProperty}
           onClose={onCheckoutResultClose}
           onScheduleSetup={onCheckoutResultScheduleSetup}
         />

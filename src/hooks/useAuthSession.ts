@@ -17,6 +17,18 @@ const INVALID_CREDENTIALS_ERROR = "Invalid email or password.";
 const REGISTER_ERROR = "Unable to create your account right now. Please try again.";
 const LOGOUT_ERROR = "Unable to sign out right now. Please try again.";
 
+let restoreSessionRequest: Promise<AuthSession | null> | null = null;
+
+const restoreSessionOnce = async () => {
+  if (!restoreSessionRequest) {
+    restoreSessionRequest = fetchCurrentSession().finally(() => {
+      restoreSessionRequest = null;
+    });
+  }
+
+  return restoreSessionRequest;
+};
+
 const getAuthErrorMessage = (caughtError: unknown, fallbackMessage: string) => {
   if (caughtError instanceof ApiError) {
     if (caughtError.status === 401) {
@@ -51,7 +63,7 @@ export default function useAuthSession() {
 
     const restoreSession = async () => {
       try {
-        const nextSession = await fetchCurrentSession();
+        const nextSession = await restoreSessionOnce();
 
         if (!isMounted) {
           return;

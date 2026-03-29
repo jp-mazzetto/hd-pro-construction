@@ -155,6 +155,11 @@ export const useCheckout = (planTier: string): UseCheckoutReturn => {
 			}
 
 			const checkout = await createCheckoutForSubscription(dbPlan.id, propertyId);
+			sessionStorage.setItem("latestCheckoutSubscriptionId", checkout.subscriptionId);
+			sessionStorage.setItem(
+				"latestCheckoutSubscriptionHasProperty",
+				propertyId ? "1" : "0",
+			);
 			window.location.href = checkout.checkoutUrl;
 		},
 		[dbPlan],

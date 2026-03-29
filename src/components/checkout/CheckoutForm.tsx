@@ -88,6 +88,62 @@ export const CheckoutForm = ({
 				</div>
 
 				<form className="relative space-y-5" onSubmit={handleSubmit}>
+					<div className="flex items-center justify-start">
+						<button
+							type="button"
+							onClick={onSubmitWithoutAddress}
+							disabled={isSubmitting || isLoadingPlan || !isPlanLoaded}
+							className="inline-flex cursor-pointer items-center rounded-full border border-white/12 bg-white/[0.03] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-400 transition-all hover:border-orange-300/35 hover:text-orange-100 disabled:cursor-not-allowed disabled:opacity-60"
+						>
+							Place address later
+						</button>
+					</div>
+
+					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+						<label className="block">
+							<div className="mb-2 flex items-center justify-between gap-2">
+								<span className="block text-[11px] font-black uppercase tracking-[0.28em] text-gray-400">
+									Zip code
+								</span>
+								<span className="text-[10px] uppercase tracking-[0.16em] text-gray-500">
+									Auto-fills city/state
+								</span>
+							</div>
+							<input
+								type="text"
+								value={form.zipCode}
+								onChange={(e) => handleFieldChange("zipCode", e.target.value)}
+								onBlur={onZipCodeBlur}
+								className={getInputClass(Boolean(fieldErrors.zipCode))}
+								placeholder="02101"
+							/>
+							{fieldErrors.zipCode && (
+								<p className="mt-1.5 text-xs text-red-300">{fieldErrors.zipCode}</p>
+							)}
+							{!fieldErrors.zipCode && zipLookupMessage && (
+								<p className="mt-1.5 text-xs text-amber-200">{zipLookupMessage}</p>
+							)}
+						</label>
+
+						<label className="block">
+							<span className="mb-2 block text-[11px] font-black uppercase tracking-[0.28em] text-gray-400">
+								Property size (sq ft)
+							</span>
+							<input
+								type="number"
+								value={form.sqFt}
+								onChange={(e) => handleFieldChange("sqFt", e.target.value)}
+								className={getInputClass(Boolean(fieldErrors.sqFt))}
+								placeholder="3000"
+								min={100}
+								max={50000}
+							/>
+							{fieldErrors.sqFt && (
+								<p className="mt-1.5 text-xs text-red-300">{fieldErrors.sqFt}</p>
+							)}
+						</label>
+					</div>
+
 					<label className="block">
 						<span className="mb-2 block text-[11px] font-black uppercase tracking-[0.28em] text-gray-400">
 							Street address
@@ -139,46 +195,6 @@ export const CheckoutForm = ({
 						</label>
 					</div>
 
-					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-						<label className="block">
-							<span className="mb-2 block text-[11px] font-black uppercase tracking-[0.28em] text-gray-400">
-								Zip code
-							</span>
-							<input
-								type="text"
-								value={form.zipCode}
-								onChange={(e) => handleFieldChange("zipCode", e.target.value)}
-								onBlur={onZipCodeBlur}
-								className={getInputClass(Boolean(fieldErrors.zipCode))}
-								placeholder="02101"
-							/>
-							{fieldErrors.zipCode && (
-								<p className="mt-1.5 text-xs text-red-300">{fieldErrors.zipCode}</p>
-							)}
-							{!fieldErrors.zipCode && zipLookupMessage && (
-								<p className="mt-1.5 text-xs text-amber-200">{zipLookupMessage}</p>
-							)}
-						</label>
-
-						<label className="block">
-							<span className="mb-2 block text-[11px] font-black uppercase tracking-[0.28em] text-gray-400">
-								Property size (sq ft)
-							</span>
-							<input
-								type="number"
-								value={form.sqFt}
-								onChange={(e) => handleFieldChange("sqFt", e.target.value)}
-								className={getInputClass(Boolean(fieldErrors.sqFt))}
-								placeholder="3000"
-								min={100}
-								max={50000}
-							/>
-							{fieldErrors.sqFt && (
-								<p className="mt-1.5 text-xs text-red-300">{fieldErrors.sqFt}</p>
-							)}
-						</label>
-					</div>
-
 					<label className="block">
 						<div className="mb-2 flex items-center justify-between gap-3">
 							<span className="text-[11px] font-black uppercase tracking-[0.28em] text-gray-400">
@@ -220,15 +236,6 @@ export const CheckoutForm = ({
 						) : (
 							"Proceed with this address"
 						)}
-					</button>
-
-					<button
-						type="button"
-						onClick={onSubmitWithoutAddress}
-						disabled={isSubmitting || isLoadingPlan || !isPlanLoaded}
-						className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/5 px-6 py-3 text-sm font-bold text-gray-200 transition-all hover:border-orange-300 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
-					>
-						Place address later
 					</button>
 
 					<p className="flex items-center justify-center gap-2 text-xs text-gray-400">

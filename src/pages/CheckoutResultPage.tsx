@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { PHONE_NUMBER } from "../consts/site";
@@ -14,6 +14,11 @@ interface CheckoutResultPageProps {
   status: "success" | "cancel";
 }
 
+type CheckoutSuccessContext = {
+  subscriptionId: string;
+  hasLinkedProperty: boolean | null;
+};
+
 const CheckoutResultPage = ({ status }: CheckoutResultPageProps) => {
   const scrolled = useScrollThreshold(50);
   const { value: isMenuOpen, toggle: toggleMenu, setFalse: closeMenu } = useToggle(false);
@@ -22,11 +27,26 @@ const CheckoutResultPage = ({ status }: CheckoutResultPageProps) => {
     useAppHandlers();
   const { requestSmsContact, requestCallContact } = useContactActions(PHONE_NUMBER);
   const [searchParams] = useSearchParams();
+  const [checkoutContext, setCheckoutContext] = useState<CheckoutSuccessContext | null>(() => {
+    const subscriptionId = sessionStorage.getItem("latestCheckoutSubscriptionId");
+    if (!subscriptionId) return null;
+
+    const storedHasLinkedProperty = sessionStorage.getItem(
+      "latestCheckoutSubscriptionHasProperty",
+    );
+
+    return {
+      subscriptionId,
+      hasLinkedProperty:
+        storedHasLinkedProperty === null ? null : storedHasLinkedProperty === "1",
+    };
+  });
 
   useCheckoutSessionVerification({
     status,
     session,
     sessionId: searchParams.get("session_id"),
+    onResolved: (result) => setCheckoutContext(result),
   });
 
   const onScheduleSetup = useMemo(() => {
@@ -35,16 +55,31 @@ const CheckoutResultPage = ({ status }: CheckoutResultPageProps) => {
     }
 
     return () => {
-      const subscriptionId = sessionStorage.getItem("latestCheckoutSubscriptionId");
+      const subscriptionId =
+        checkoutContext?.subscriptionId ??
+        sessionStorage.getItem("latestCheckoutSubscriptionId");
+      const storedHasLinkedProperty = sessionStorage.getItem(
+        "latestCheckoutSubscriptionHasProperty",
+      );
+      const hasLinkedProperty =
+        checkoutContext?.hasLinkedProperty ??
+        (storedHasLinkedProperty === null ? null : storedHasLinkedProperty === "1");
+
       if (subscriptionId) {
         sessionStorage.removeItem("latestCheckoutSubscriptionId");
-        navigateToDashboard("subscription-detail", { id: subscriptionId });
+        sessionStorage.removeItem("latestCheckoutSubscriptionHasProperty");
+
+        if (hasLinkedProperty === true) {
+          navigateToDashboard("schedule-setup", { id: subscriptionId });
+        } else {
+          navigateToDashboard("subscription-detail", { id: subscriptionId });
+        }
         return;
       }
 
       navigateToDashboard("overview");
     };
-  }, [status, session, navigateToDashboard]);
+  }, [status, session, navigateToDashboard, checkoutContext]);
 
   return (
     <HomeView
@@ -61,6 +96,7 @@ const CheckoutResultPage = ({ status }: CheckoutResultPageProps) => {
       onPlanRequest={handlePlanRequest}
       onCallRequest={requestCallContact}
       onCheckoutResultClose={navigateToHome}
+      checkoutResultHasLinkedProperty={checkoutContext?.hasLinkedProperty}
       onCheckoutResultScheduleSetup={onScheduleSetup}
     />
   );
