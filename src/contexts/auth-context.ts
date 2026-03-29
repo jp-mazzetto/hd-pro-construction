@@ -18,6 +18,7 @@ export interface AuthContextValue {
   register: (input: RegisterInput) => Promise<boolean>;
   continueWithGoogle: () => void;
   logout: () => Promise<void>;
+  updateSessionActorName: (name: string) => void;
   pendingPlan: SubscriptionPlanName | null;
   setPendingPlan: (plan: SubscriptionPlanName | null) => void;
 }

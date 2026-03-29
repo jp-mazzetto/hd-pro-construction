@@ -34,7 +34,16 @@ const CheckoutResultPage = ({ status }: CheckoutResultPageProps) => {
       return undefined;
     }
 
-    return () => navigateToDashboard("overview");
+    return () => {
+      const subscriptionId = sessionStorage.getItem("latestCheckoutSubscriptionId");
+      if (subscriptionId) {
+        sessionStorage.removeItem("latestCheckoutSubscriptionId");
+        navigateToDashboard("subscription-detail", { id: subscriptionId });
+        return;
+      }
+
+      navigateToDashboard("overview");
+    };
   }, [status, session, navigateToDashboard]);
 
   return (

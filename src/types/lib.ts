@@ -35,6 +35,16 @@ export interface CheckoutSessionResult {
 }
 
 export type SubscriptionStatus = "PENDING" | "ACTIVE" | "CANCELLED" | "EXPIRED";
+export type SubscriptionLifecycleState =
+  | "PENDING"
+  | "ACTIVE"
+  | "END_SCHEDULED"
+  | "EXPIRED";
+export type SubscriptionBillingState =
+  | "PENDING"
+  | "CURRENT"
+  | "PAST_DUE"
+  | "UNPAID";
 
 export interface SubscriptionPropertySummary {
   id: string;
@@ -50,11 +60,16 @@ export interface SubscriptionPropertySummary {
 export interface UserSubscription {
   id: string;
   status: SubscriptionStatus;
+  lifecycleState: SubscriptionLifecycleState;
+  billingState: SubscriptionBillingState;
+  billingGraceUntil: string | null;
+  lastPaymentFailedAt: string | null;
+  lastPaymentRecoveredAt: string | null;
   startDate: string;
   endDate: string;
   cancelledAt: string | null;
   cancellationReason: string | null;
   createdAt: string;
   plan: SubscriptionPlan;
-  property: SubscriptionPropertySummary;
+  property: SubscriptionPropertySummary | null;
 }

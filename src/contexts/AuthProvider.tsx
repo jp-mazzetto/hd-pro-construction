@@ -17,6 +17,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     register,
     continueWithGoogle,
     logout,
+    updateSessionActorName,
   } = useAuthSession();
 
   const {
@@ -46,6 +47,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         register,
         continueWithGoogle,
         logout,
+        updateSessionActorName,
         pendingPlan,
         setPendingPlan,
       }}

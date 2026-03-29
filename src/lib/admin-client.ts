@@ -23,7 +23,14 @@ const request = async <T>(
   }
 
   const text = await response.text();
-  const data = text.length > 0 ? JSON.parse(text) : null;
+  let data: unknown = null;
+  if (text.length > 0) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = null;
+    }
+  }
 
   if (!response.ok) {
     const message =

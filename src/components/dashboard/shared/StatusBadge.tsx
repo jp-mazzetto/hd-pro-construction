@@ -5,6 +5,7 @@ const STATUS_STYLES: Record<string, string> = {
   PENDING: "border-amber-400/40 bg-amber-500/15 text-amber-300",
   SCHEDULED: "border-sky-400/40 bg-blue-500/15 text-sky-300",
   CANCELLED: "border-red-400/45 bg-red-500/15 text-red-300",
+  END_SCHEDULED: "border-amber-400/40 bg-amber-500/15 text-amber-300",
   EXPIRED: "border-slate-400/30 bg-gray-500/15 text-slate-300",
   OVERDUE: "border-red-400/45 bg-red-500/15 text-red-300",
   WAIVED: "border-fuchsia-400/40 bg-purple-500/15 text-fuchsia-300",
@@ -25,7 +26,7 @@ export default function StatusBadge({ status, className = "" }: StatusBadgeProps
       className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.15em] ${style} ${className}`}
     >
       <span className="h-1.5 w-1.5 rounded-full bg-current opacity-75" />
-      {status.replace("_", " ")}
+      {status === "END_SCHEDULED" ? "Cancels at end" : status.replace("_", " ")}
     </span>
   );
 }

@@ -109,10 +109,27 @@ export default function ScheduleSetupPage({
         <p className="text-sm text-red-400">{error}</p>
         <button
           type="button"
-          onClick={() => onNavigate("subscriptions")}
+          onClick={() => onNavigate("overview")}
           className="text-sm font-semibold text-orange-400 hover:text-orange-300 cursor-pointer"
         >
-          Back to plans
+          Back to dashboard
+        </button>
+      </div>
+    );
+  }
+
+  if (sub && !sub.property) {
+    return (
+      <div className="space-y-4">
+        <p className="text-sm text-amber-300">
+          This subscription has no linked address yet. Link an address first.
+        </p>
+        <button
+          type="button"
+          onClick={() => onNavigate("subscription-detail", { id: subscriptionId })}
+          className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-700 cursor-pointer"
+        >
+          Go to Subscription
         </button>
       </div>
     );

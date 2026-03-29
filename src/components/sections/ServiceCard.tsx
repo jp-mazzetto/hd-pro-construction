@@ -12,7 +12,7 @@ interface ServiceCardProps {
  */
 const ServiceCard = ({ service, onRequest }: ServiceCardProps) => {
   return (
-    <article className="group relative isolate min-h-[24rem] overflow-hidden rounded-[2rem] bg-gray-900 shadow-xl transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl">
+    <article className="group relative isolate min-h-96 overflow-hidden rounded-4xl bg-gray-900 shadow-xl transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl">
       <img
         src={service.imageSrc}
         alt={service.imageAlt}
@@ -20,9 +20,9 @@ const ServiceCard = ({ service, onRequest }: ServiceCardProps) => {
         className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
       />
 
-      <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/65 to-gray-950/20 transition-all duration-500 group-hover:from-gray-950/95 group-hover:via-gray-900/50" />
+      <div className="absolute inset-0 bg-linear-to-t from-gray-950 via-gray-900/65 to-gray-950/20 transition-all duration-500 group-hover:from-gray-950/95 group-hover:via-gray-900/50" />
 
-      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-orange-500 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-transparent via-orange-500 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
       <div className="relative flex h-full flex-col justify-end p-7 sm:p-8">
         <p className="mb-3 text-[10px] font-black uppercase tracking-[0.28em] text-orange-300">

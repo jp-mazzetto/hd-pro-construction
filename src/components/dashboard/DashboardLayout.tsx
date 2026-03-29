@@ -8,11 +8,9 @@ import "./dashboard-theme.css";
 
 const SECTION_TITLES: Record<DashboardSection, string> = {
   overview: "Dashboard",
-  subscriptions: "My Plans",
   "subscription-detail": "Plan Details",
   properties: "Properties",
   billing: "Billing History",
-  referrals: "Referral Program",
   schedule: "Schedule",
   "schedule-setup": "Set Up Schedule",
   settings: "Settings",
@@ -51,10 +49,11 @@ export default function DashboardLayout({
 
       {/* Desktop sidebar */}
       <DashboardSidebar
+        session={session}
         currentSection={currentSection}
         onNavigate={handleNavigate}
         onGoHome={onGoHome}
-        className="hidden lg:flex w-60 shrink-0"
+        className="hidden lg:flex w-64 shrink-0"
       />
 
       {/* Mobile sidebar overlay */}
@@ -67,10 +66,11 @@ export default function DashboardLayout({
             role="presentation"
           />
           <DashboardSidebar
+            session={session}
             currentSection={currentSection}
             onNavigate={handleNavigate}
             onGoHome={onGoHome}
-            className="fixed inset-y-0 left-0 z-50 w-60 lg:hidden"
+            className="fixed inset-y-0 left-0 z-50 w-64 lg:hidden"
           />
         </>
       )}
@@ -82,9 +82,10 @@ export default function DashboardLayout({
           title={SECTION_TITLES[currentSection]}
           onLogout={onLogout}
           onMenuToggle={() => setIsMobileMenuOpen((prev) => !prev)}
+          onNavigate={handleNavigate}
         />
 
-        <main className="dashboard-main-scroll flex-1 overflow-y-auto px-4 pb-8 pt-5 sm:px-6 sm:pt-6 lg:px-8">
+        <main className="dashboard-main-scroll flex-1 overflow-y-auto px-4 pb-8 pt-6 sm:px-6 lg:px-8">
           <div className="dashboard-enter mx-auto w-full max-w-7xl">
             {children}
           </div>

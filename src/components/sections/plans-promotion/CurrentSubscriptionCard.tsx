@@ -20,7 +20,7 @@ interface SubscriptionDetailItemProps {
 export const CurrentSubscriptionCard = ({
   subscription,
 }: CurrentSubscriptionCardProps) => (
-  <div className="mb-10 rounded-3xl border border-orange-400/25 bg-gradient-to-br from-gray-800 to-gray-900 p-7 shadow-2xl shadow-black/35 md:p-8">
+  <div className="mb-10 rounded-3xl border border-orange-400/25 bg-linear-to-br from-gray-800 to-gray-900 p-7 shadow-2xl shadow-black/35 md:p-8">
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div>
         <p className="text-[11px] font-black uppercase tracking-[0.32em] text-orange-300">
@@ -53,7 +53,9 @@ export const CurrentSubscriptionCard = ({
         label="Property"
         icon={<Home size={14} className="text-orange-300" />}
       >
-        {subscription.property.city}, {subscription.property.state}
+        {subscription.property
+          ? `${subscription.property.city}, ${subscription.property.state}`
+          : "Address pending"}
       </SubscriptionDetailItem>
 
       <SubscriptionDetailItem

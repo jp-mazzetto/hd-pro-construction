@@ -132,7 +132,7 @@ const getPlanCtaLabel = ({
   }
 
   if (hasSubscription) {
-    return `Change to ${planTier.replace(" Plan", "")}`;
+    return "Adicionar um novo plano a um novo endereço";
   }
 
   if (isStandard) {

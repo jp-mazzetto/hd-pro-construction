@@ -87,11 +87,9 @@ export interface AuthIdentityView {
 
 export type DashboardSection =
   | "overview"
-  | "subscriptions"
   | "subscription-detail"
   | "properties"
   | "billing"
-  | "referrals"
   | "schedule"
   | "schedule-setup"
   | "settings";

@@ -22,11 +22,12 @@ const CheckoutPage = ({ planTier, onBack }: CheckoutPageProps) => {
     planNotFound,
     isSubmitting,
     error,
-    handleSubmit,
+    handleSubmitWithAddress,
+    handleSubmitWithoutAddress,
   } = useCheckout(planTier);
 
   const onFormSubmit = () => {
-    handleSubmit();
+    handleSubmitWithAddress();
   };
 
   // Plan not found state
@@ -112,8 +113,7 @@ const CheckoutPage = ({ planTier, onBack }: CheckoutPageProps) => {
               </h1>
 
               <p className="mt-4 max-w-2xl text-sm text-gray-300 sm:text-base">
-                Confirm your property details and continue to Stripe for payment. We
-                activate the subscription only after payment confirmation.
+                Fill in the address now, or continue and link it later from your dashboard.
               </p>
             </div>
 
@@ -143,7 +143,8 @@ const CheckoutPage = ({ planTier, onBack }: CheckoutPageProps) => {
               isLoadingPlan={isLoadingPlan}
               isPlanLoaded={!!dbPlan}
               onUpdateField={updateField}
-              onSubmit={onFormSubmit}
+              onSubmitWithAddress={onFormSubmit}
+              onSubmitWithoutAddress={handleSubmitWithoutAddress}
             />
           </div>
         </div>

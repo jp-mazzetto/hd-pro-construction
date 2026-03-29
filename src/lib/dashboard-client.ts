@@ -33,7 +33,14 @@ const request = async <T>(
   }
 
   const text = await response.text();
-  const data = text.length > 0 ? JSON.parse(text) : null;
+  let data: unknown = null;
+  if (text.length > 0) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = null;
+    }
+  }
 
   if (!response.ok) {
     const message =
@@ -83,9 +90,26 @@ export const verifyCheckoutSession = (sessionId: string) =>
   );
 
 export const resumeCheckout = (subscriptionId: string) =>
-  request<{ status: "activated" | "checkout_url"; subscriptionId?: string; checkoutUrl?: string }>(
+  request<{
+    status: "activated" | "checkout_url";
+    subscriptionId?: string;
+    checkoutUrl?: string;
+    reason?: "open_session" | "session_expired_recreated";
+  }>(
     `/api/subscription/subscriptions/${subscriptionId}/resume-checkout`,
     { method: "POST" },
+  );
+
+export const linkSubscriptionProperty = (
+  subscriptionId: string,
+  propertyId: string,
+) =>
+  request<UserSubscription>(
+    `/api/subscription/subscriptions/${subscriptionId}/property`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({ propertyId }),
+    },
   );
 
 // ─── Properties ───────────────────────────────────────────────────────────────

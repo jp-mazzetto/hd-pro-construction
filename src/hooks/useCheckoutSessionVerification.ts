@@ -19,9 +19,18 @@ const useCheckoutSessionVerification = ({
       return;
     }
 
-    void verifyCheckoutSession(sessionId).catch(() => {
-      // Non-critical: webhook may have already activated the subscription
-    });
+    void verifyCheckoutSession(sessionId)
+      .then((result) => {
+        if (result.subscriptionId) {
+          sessionStorage.setItem(
+            "latestCheckoutSubscriptionId",
+            result.subscriptionId,
+          );
+        }
+      })
+      .catch(() => {
+        // Non-critical: webhook may have already activated the subscription
+      });
   }, [status, session, sessionId]);
 };
 

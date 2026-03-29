@@ -8,7 +8,7 @@ interface AdminPageProps {
   section: AdminSection;
 }
 
-const AdminPage = ({ section: _section }: AdminPageProps) => {
+const AdminPage = ({ section }: AdminPageProps) => {
   const { session, isAuthLoading, logout } = useAuth();
 
   if (isAuthLoading) {
@@ -24,11 +24,13 @@ const AdminPage = ({ section: _section }: AdminPageProps) => {
     return null;
   }
 
+  const content = section === "visit-calendar" ? <VisitCalendarPage /> : null;
+
   return (
     <>
       <AppSeo />
       <AdminLayout session={session} onLogout={logout}>
-        <VisitCalendarPage />
+        {content}
       </AdminLayout>
     </>
   );

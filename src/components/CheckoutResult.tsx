@@ -26,7 +26,7 @@ const CheckoutResult = ({ status, onClose, onScheduleSetup }: CheckoutResultProp
 
         <p className="mt-3 text-gray-600">
           {isSuccess
-            ? "Your lawn maintenance plan is now active. Set up your preferred schedule to get started."
+            ? "Your plan payment is confirmed. Now link this plan to one of your addresses to finish setup."
             : "Your checkout was cancelled and no charges were made. You can subscribe anytime from the plans section."}
         </p>
 
@@ -37,7 +37,7 @@ const CheckoutResult = ({ status, onClose, onScheduleSetup }: CheckoutResultProp
               onClick={onScheduleSetup}
               className="w-full cursor-pointer bg-amber-400 py-4 font-bold text-gray-950 transition-all hover:opacity-90"
             >
-              Set Up My Schedule
+              Link Address Now
             </button>
             <button
               type="button"

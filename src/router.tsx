@@ -27,11 +27,9 @@ const router = createBrowserRouter([
         element: <ProtectedLayout />,
         children: [
           { index: true, element: <DashboardPage section="overview" /> },
-          { path: "subscriptions", element: <DashboardPage section="subscriptions" /> },
           { path: "subscriptions/:id", element: <DashboardPage section="subscription-detail" /> },
           { path: "properties", element: <DashboardPage section="properties" /> },
           { path: "billing", element: <DashboardPage section="billing" /> },
-          { path: "referrals", element: <DashboardPage section="referrals" /> },
           { path: "schedule", element: <DashboardPage section="schedule" /> },
           { path: "schedule/setup/:id", element: <DashboardPage section="schedule-setup" /> },
           { path: "settings", element: <DashboardPage section="settings" /> },

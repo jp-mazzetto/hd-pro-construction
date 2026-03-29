@@ -138,6 +138,20 @@ export default function useAuthSession() {
     window.location.assign(getGoogleAuthStartUrl());
   };
 
+  const updateSessionActorName = (name: string) => {
+    setSession((prevSession) =>
+      prevSession
+        ? {
+            ...prevSession,
+            actor: {
+              ...prevSession.actor,
+              name,
+            },
+          }
+        : prevSession,
+    );
+  };
+
   return {
     session,
     isLoading,
@@ -149,5 +163,6 @@ export default function useAuthSession() {
     register,
     continueWithGoogle,
     logout,
+    updateSessionActorName,
   };
 }

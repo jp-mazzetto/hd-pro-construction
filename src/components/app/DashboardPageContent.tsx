@@ -1,15 +1,14 @@
 import BillingPage from "../dashboard/pages/BillingPage";
 import OverviewPage from "../dashboard/pages/OverviewPage";
 import PropertiesPage from "../dashboard/pages/PropertiesPage";
-import ReferralsPage from "../dashboard/pages/ReferralsPage";
 import SchedulePage from "../dashboard/pages/SchedulePage";
 import ScheduleSetupPage from "../dashboard/pages/ScheduleSetupPage";
 import SettingsPage from "../dashboard/pages/SettingsPage";
 import SubscriptionDetailPage from "../dashboard/pages/SubscriptionDetailPage";
-import SubscriptionsPage from "../dashboard/pages/SubscriptionsPage";
 import type { DashboardRouteParams, NavigateToDashboard } from "../../types/app";
 import type { AuthSession } from "../../types/auth";
 import type { DashboardSection } from "../../types/dashboard";
+import useAuth from "../../hooks/useAuth";
 
 interface DashboardPageContentProps {
   session: AuthSession;
@@ -26,16 +25,11 @@ const DashboardPageContent = ({
   onNavigate,
   onNavigateToPlans,
 }: DashboardPageContentProps) => {
+  const { updateSessionActorName } = useAuth();
+
   switch (section) {
     case "overview":
       return <OverviewPage onNavigate={onNavigate} onNavigateToPlans={onNavigateToPlans} />;
-    case "subscriptions":
-      return (
-        <SubscriptionsPage
-          onNavigate={onNavigate}
-          onNavigateToPlans={onNavigateToPlans}
-        />
-      );
     case "subscription-detail":
       return (
         <SubscriptionDetailPage
@@ -47,8 +41,6 @@ const DashboardPageContent = ({
       return <PropertiesPage />;
     case "billing":
       return <BillingPage />;
-    case "referrals":
-      return <ReferralsPage />;
     case "schedule":
       return <SchedulePage onNavigate={onNavigate} />;
     case "schedule-setup":
@@ -59,7 +51,7 @@ const DashboardPageContent = ({
         />
       );
     case "settings":
-      return <SettingsPage session={session} onSessionUpdate={() => {}} />;
+      return <SettingsPage session={session} onSessionUpdate={updateSessionActorName} />;
     default:
       return <OverviewPage onNavigate={onNavigate} onNavigateToPlans={onNavigateToPlans} />;
   }

@@ -25,7 +25,7 @@ export const getSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
  */
 export const findPlanByTier = (
     plans: SubscriptionPlan[],
-    tier: string,
+    tier: SubscriptionPlan["tier"],
 ): SubscriptionPlan | undefined => {
     return plans.find((plan) => plan.tier === tier);
 };
@@ -48,13 +48,13 @@ export const createPropertyForCheckout = async (
  * Creates a Stripe checkout session for the subscription.
  *
  * @param planId - The ID of the selected subscription plan
- * @param propertyId - The ID of the property to associate with the subscription
+ * @param propertyId - Optional property ID to link before payment
  * @returns The checkout session result containing the Stripe redirect URL
  * @throws {ApiError} When the checkout session creation fails
  */
 export const createCheckoutForSubscription = async (
     planId: string,
-    propertyId: string,
+    propertyId?: string,
 ): Promise<CheckoutSessionResult> => {
     const { createCheckoutSession } = await import("./auth-client");
     return createCheckoutSession({ planId, propertyId });
@@ -64,15 +64,17 @@ export const createCheckoutForSubscription = async (
  * Normalizes the plan tier from URL parameter to internal format.
  *
  * @param planTier - The tier string from URL (e.g., "basic", "standard", "premium")
- * @returns The normalized tier string (e.g., "BASIC", "STANDARD", "PREMIUM")
+ * @returns The normalized tier or null when the query value is invalid
  */
-export const normalizePlanTier = (planTier: string): string => {
-    const TIER_MAP: Record<string, string> = {
+export const normalizePlanTier = (
+    planTier: string,
+): SubscriptionPlan["tier"] | null => {
+    const TIER_MAP: Record<string, SubscriptionPlan["tier"]> = {
         basic: "BASIC",
         standard: "STANDARD",
         premium: "PREMIUM",
     };
-    return TIER_MAP[planTier.toLowerCase()] ?? "STANDARD";
+    return TIER_MAP[planTier.toLowerCase()] ?? null;
 };
 
 /**

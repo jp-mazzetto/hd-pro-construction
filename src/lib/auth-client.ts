@@ -84,7 +84,14 @@ const request = async <T>(
   }
 
   const responseText = await response.text();
-  const data = responseText.length > 0 ? JSON.parse(responseText) : null;
+  let data: unknown = null;
+  if (responseText.length > 0) {
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = null;
+    }
+  }
 
   if (!response.ok) {
     const parsedMessage: string =
@@ -190,15 +197,15 @@ export const createProperty = (input: CreatePropertyInput) =>
 /**
  * Cria uma sessão de checkout para uma assinatura.
  *
- * Faz `POST /api/subscription/subscriptions/checkout` associando
- * um plano a uma propriedade. Retorna a URL de checkout (Stripe)
- * para onde o usuário deve ser redirecionado para efetuar o pagamento.
+ * Faz `POST /api/subscription/subscriptions/checkout` com o plano
+ * selecionado e retorna a URL de checkout (Stripe) para onde o
+ * usuário deve ser redirecionado para efetuar o pagamento.
  *
- * @param input - IDs do plano e da propriedade a serem vinculados.
+ * @param input - ID do plano selecionado.
  */
 export const createCheckoutSession = (input: {
   planId: string;
-  propertyId: string;
+  propertyId?: string;
 }) =>
   request<CheckoutSessionResult>(
     "/api/subscription/subscriptions/checkout",

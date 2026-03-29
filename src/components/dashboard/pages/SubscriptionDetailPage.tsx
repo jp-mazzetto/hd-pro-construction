@@ -2,11 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft, CalendarDays, ExternalLink, Loader2, XCircle } from "lucide-react";
 
 import type { DashboardSection } from "../../../types/dashboard";
-import type { UserSubscription } from "../../../types/lib";
+import type { Property, UserSubscription } from "../../../types/lib";
 import {
-  fetchSubscription,
-  cancelSubscription,
-  resumeCheckout,
+	fetchSubscription,
+	cancelSubscription,
+	fetchProperties,
+	linkSubscriptionProperty,
+	resumeCheckout,
 } from "../../../lib/dashboard-client";
 import StatusBadge from "../shared/StatusBadge";
 
@@ -24,8 +26,11 @@ export default function SubscriptionDetailPage({
   const [error, setError] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
   const [isResuming, setIsResuming] = useState(false);
+  const [isLinkingProperty, setIsLinkingProperty] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [selectedPropertyId, setSelectedPropertyId] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -33,7 +38,17 @@ export default function SubscriptionDetailPage({
     const load = async () => {
       try {
         const data = await fetchSubscription(subscriptionId);
-        if (!cancelled) setSub(data);
+        if (cancelled) return;
+        setSub(data);
+
+        if (!data.property) {
+          const userProperties = await fetchProperties().catch(() => []);
+          if (cancelled) return;
+          setProperties(userProperties);
+          if (userProperties.length > 0) {
+            setSelectedPropertyId(userProperties[0].id);
+          }
+        }
       } catch {
         if (!cancelled) setError("Failed to load subscription details.");
       } finally {
@@ -78,6 +93,21 @@ export default function SubscriptionDetailPage({
     }
   }, [sub, cancelReason]);
 
+  const handleLinkProperty = useCallback(async () => {
+    if (!sub || !selectedPropertyId) return;
+
+    setIsLinkingProperty(true);
+    setError(null);
+    try {
+      const updated = await linkSubscriptionProperty(sub.id, selectedPropertyId);
+      setSub(updated);
+    } catch {
+      setError("Failed to link property to this subscription.");
+    } finally {
+      setIsLinkingProperty(false);
+    }
+  }, [sub, selectedPropertyId]);
+
   if (isLoading) {
     return <div className="h-64 animate-pulse rounded-xl bg-slate-900" />;
   }
@@ -91,16 +121,18 @@ export default function SubscriptionDetailPage({
       {/* Back button */}
       <button
         type="button"
-        onClick={() => onNavigate("subscriptions")}
+        onClick={() => onNavigate("overview")}
         className="flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-white cursor-pointer"
       >
-        <ArrowLeft size={16} /> Back to plans
+        <ArrowLeft size={16} /> Back to dashboard
       </button>
 
       {/* Header */}
       <div className="flex flex-wrap items-center gap-3">
         <h2 className="text-xl font-black text-white">{sub.plan.name}</h2>
-        <StatusBadge status={sub.status} />
+        <StatusBadge
+          status={sub.lifecycleState === "END_SCHEDULED" ? "END_SCHEDULED" : sub.status}
+        />
       </div>
 
       {/* Info grid */}
@@ -160,30 +192,71 @@ export default function SubscriptionDetailPage({
           <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">
             Property
           </h3>
-          <dl className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <dt className="text-slate-400">Address</dt>
-              <dd className="font-semibold text-white text-right">
-                {sub.property.street}
-              </dd>
+          {sub.property ? (
+            <>
+              <dl className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <dt className="text-slate-400">Address</dt>
+                  <dd className="font-semibold text-white text-right">
+                    {sub.property.street}
+                  </dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-slate-400">City</dt>
+                  <dd className="font-semibold text-white">
+                    {sub.property.city}, {sub.property.state} {sub.property.zipCode}
+                  </dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-slate-400">Size</dt>
+                  <dd className="font-semibold text-white">
+                    {sub.property.sqFt.toLocaleString()} sq ft
+                  </dd>
+                </div>
+              </dl>
+              {sub.property.notes && (
+                <p className="mt-3 border-t border-slate-800 pt-3 text-xs text-slate-400">
+                  {sub.property.notes}
+                </p>
+              )}
+            </>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-xs text-amber-300">
+                Address not linked yet. This must be completed before schedule setup.
+              </p>
+              {properties.length > 0 ? (
+                <>
+                  <select
+                    value={selectedPropertyId}
+                    onChange={(e) => setSelectedPropertyId(e.target.value)}
+                    className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-orange-500 focus:outline-none"
+                  >
+                    {properties.map((property) => (
+                      <option key={property.id} value={property.id}>
+                        {property.street} - {property.city}, {property.state}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={handleLinkProperty}
+                    disabled={isLinkingProperty || !selectedPropertyId}
+                    className="w-full rounded-lg bg-orange-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-orange-700 disabled:opacity-50 cursor-pointer"
+                  >
+                    {isLinkingProperty ? "Linking..." : "Link Address"}
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => onNavigate("properties")}
+                  className="w-full rounded-lg border border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-200 hover:bg-slate-800 cursor-pointer"
+                >
+                  Add Address First
+                </button>
+              )}
             </div>
-            <div className="flex justify-between">
-              <dt className="text-slate-400">City</dt>
-              <dd className="font-semibold text-white">
-                {sub.property.city}, {sub.property.state} {sub.property.zipCode}
-              </dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-slate-400">Size</dt>
-              <dd className="font-semibold text-white">
-                {sub.property.sqFt.toLocaleString()} sq ft
-              </dd>
-            </div>
-          </dl>
-          {sub.property.notes && (
-            <p className="mt-3 border-t border-slate-800 pt-3 text-xs text-slate-400">
-              {sub.property.notes}
-            </p>
           )}
         </div>
       </div>
@@ -211,7 +284,7 @@ export default function SubscriptionDetailPage({
           </button>
         )}
 
-        {sub.status === "ACTIVE" && (
+        {sub.status === "ACTIVE" && sub.lifecycleState !== "END_SCHEDULED" && sub.property && (
           <button
             type="button"
             onClick={() =>
@@ -223,7 +296,7 @@ export default function SubscriptionDetailPage({
           </button>
         )}
 
-        {sub.status === "ACTIVE" && (
+        {sub.status === "ACTIVE" && sub.lifecycleState !== "END_SCHEDULED" && (
           <button
             type="button"
             onClick={() => setShowCancelConfirm(true)}
@@ -234,6 +307,24 @@ export default function SubscriptionDetailPage({
         )}
       </div>
 
+      {/* Cancellation scheduled notice */}
+      {sub.lifecycleState === "END_SCHEDULED" && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
+          <p className="text-sm font-semibold text-amber-300">Cancellation scheduled</p>
+          <p className="mt-1 text-xs text-slate-400">
+            Your subscription will remain active until{" "}
+            <span className="text-white">
+              {new Date(sub.endDate).toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </span>
+            . No further charges will be made after that date.
+          </p>
+        </div>
+      )}
+
       {/* Cancel confirmation */}
       {showCancelConfirm && (
         <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-5">
@@ -241,8 +332,8 @@ export default function SubscriptionDetailPage({
             Confirm Cancellation
           </h3>
           <p className="mb-3 text-xs text-slate-400">
-            Your subscription will remain active until the end date. Service
-            continues until then.
+            This will cancel your subscription immediately and stop upcoming
+            scheduled services.
           </p>
           <textarea
             placeholder="Reason for cancellation (optional)"
