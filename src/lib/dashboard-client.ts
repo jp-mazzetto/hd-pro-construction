@@ -149,6 +149,24 @@ export const fetchBillingCycles = async () => {
   return data.billingCycles;
 };
 
+export const createBillingCheckoutSession = (billingCycleId: string) =>
+  request<{
+    billingCycleId: string;
+    checkoutSessionId: string;
+    checkoutUrl: string;
+  }>(`/api/subscription/billing/${billingCycleId}/pay-in-advance`, {
+    method: "POST",
+  });
+
+export const verifyBillingCheckoutSession = (sessionId: string) =>
+  request<{ status: "paid" | "already_paid"; billingCycleId: string }>(
+    "/api/subscription/billing/checkout/verify",
+    {
+      method: "POST",
+      body: JSON.stringify({ sessionId }),
+    },
+  );
+
 // ─── Schedule ─────────────────────────────────────────────────────────────────
 
 export const createSchedulePreference = (
