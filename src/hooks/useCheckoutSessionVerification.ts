@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { fetchSubscription, verifyCheckoutSession } from "../lib/dashboard-client";
 import type { AuthSession } from "../types/auth";
@@ -14,15 +14,28 @@ interface UseCheckoutSessionVerificationOptions {
 }
 
 const useCheckoutSessionVerification = ({
-  status,
-  session,
-  sessionId,
-  onResolved,
+	status,
+	session,
+	sessionId,
+	onResolved,
 }: UseCheckoutSessionVerificationOptions) => {
+	const lastVerifiedSessionIdRef = useRef<string | null>(null);
+	const onResolvedRef = useRef(onResolved);
+
+	useEffect(() => {
+		onResolvedRef.current = onResolved;
+	}, [onResolved]);
+
   useEffect(() => {
     if (status !== "success" || !sessionId || !session) {
       return;
     }
+
+		if (lastVerifiedSessionIdRef.current === sessionId) {
+			return;
+		}
+
+		lastVerifiedSessionIdRef.current = sessionId;
 
     void verifyCheckoutSession(sessionId)
       .then(async (result) => {
@@ -45,7 +58,7 @@ const useCheckoutSessionVerification = ({
             result.subscriptionId,
           );
 
-          onResolved?.({
+          onResolvedRef.current?.({
             subscriptionId: result.subscriptionId,
             hasLinkedProperty,
           });
@@ -54,7 +67,7 @@ const useCheckoutSessionVerification = ({
       .catch(() => {
         // Non-critical: webhook may have already activated the subscription
       });
-  }, [status, session, sessionId, onResolved]);
+  }, [status, session, sessionId]);
 };
 
 export default useCheckoutSessionVerification;

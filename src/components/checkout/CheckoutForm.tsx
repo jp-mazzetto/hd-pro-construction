@@ -93,7 +93,7 @@ export const CheckoutForm = ({
 							type="button"
 							onClick={onSubmitWithoutAddress}
 							disabled={isSubmitting || isLoadingPlan || !isPlanLoaded}
-							className="inline-flex cursor-pointer items-center rounded-full border border-white/12 bg-white/[0.03] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-400 transition-all hover:border-orange-300/35 hover:text-orange-100 disabled:cursor-not-allowed disabled:opacity-60"
+							className="inline-flex cursor-pointer items-center rounded-full border border-white/12 bg-white/3 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-400 transition-all hover:border-orange-300/35 hover:text-orange-100 disabled:cursor-not-allowed disabled:opacity-60"
 						>
 							Place address later
 						</button>
