@@ -9,6 +9,7 @@ export interface ZipCodeLookupResult {
 export type ZipCodeLookupErrorKind =
   | "invalid_zip"
   | "not_found"
+  | "not_massachusetts"
   | "request_failed";
 
 export class ZipCodeLookupError extends Error {
@@ -98,6 +99,14 @@ export const fetchZipCodeDetails = async (
       throw new ZipCodeLookupError(
         errorPayload?.message ?? "ZIP code not found.",
         "not_found",
+        response.status,
+      );
+    }
+
+    if (kind === "not_massachusetts" || response.status === 422) {
+      throw new ZipCodeLookupError(
+        errorPayload?.message ?? "We currently only service Massachusetts.",
+        "not_massachusetts",
         response.status,
       );
     }

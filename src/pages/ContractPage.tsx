@@ -58,6 +58,7 @@ const ContractPage = () => {
 
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [isArbitrationChecked, setIsArbitrationChecked] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -112,7 +113,7 @@ const ContractPage = () => {
   };
 
   const handleAccept = async () => {
-    if (!isChecked || isSubmitting) return;
+    if (!isChecked || !isArbitrationChecked || isSubmitting) return;
     setIsSubmitting(true);
     setSubmitError(null);
     try {
@@ -160,14 +161,20 @@ const ContractPage = () => {
   const total = fmt(plan.priceInCents * 12);
   const maxDeposit = fmt(Math.round((plan.priceInCents * 12) / 3));
   const maxEarlyTerminationFee = fmt(Math.ceil((plan.priceInCents * 12) / 3));
+  const pricePerVisit = fmt(Math.round(plan.priceInCents / plan.visitsPerMonth));
+  const etExamples = [3, 6, 9].map((monthCompleted) => ({
+    monthCompleted,
+    remaining: 12 - monthCompleted,
+    fee: fmt(Math.ceil((plan.priceInCents * (12 - monthCompleted)) / 3)),
+  }));
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen overflow-x-hidden bg-slate-950 font-sans text-gray-900 selection:bg-orange-600 selection:text-white">
       {/* Background */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-orange-600/8 blur-[120px]" />
-        <div className="absolute right-1/4 top-1/3 h-[400px] w-[400px] rounded-full bg-orange-500/5 blur-[100px]" />
+        <div className="absolute -top-40 left-1/4 h-125 w-125 rounded-full bg-orange-600/8 blur-[120px]" />
+        <div className="absolute right-1/4 top-1/3 h-100 w-100 rounded-full bg-orange-500/5 blur-[100px]" />
       </div>
 
       <div className="relative mx-auto max-w-3xl px-4 py-10 sm:px-6">
@@ -240,11 +247,13 @@ const ContractPage = () => {
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="max-h-[520px] overflow-y-auto rounded-3xl border border-white/10 bg-black/30 p-6 backdrop-blur-xl sm:p-8"
+          className="max-h-130 overflow-y-auto rounded-3xl border border-white/10 bg-black/30 p-6 backdrop-blur-xl sm:p-8"
         >
           {/* Parties */}
           <div className="mb-8 rounded-2xl border border-white/8 bg-white/3 p-5">
             <DataRow label="Service Provider" value="HD Construction LLC — Massachusetts" />
+            <DataRow label="EIN" value="99-4598349" />
+            <DataRow label="Salesperson" value="N/A" />
             <DataRow label="Client" value={`${session.actor.name} (${session.actor.email})`} />
             <DataRow label="Plan" value={plan.name} />
             <DataRow label="Property address" value="As provided during checkout setup" />
@@ -302,7 +311,11 @@ const ContractPage = () => {
             <Para>
               The Client agrees to pay <strong className="text-white">{monthly} per month</strong>{" "}
               for the duration of this Agreement, totaling{" "}
-              <strong className="text-white">{total}</strong> over 12 months.
+              <strong className="text-white">{total}</strong> over 12 months. The contracted rate
+              per visit under this plan is{" "}
+              <strong className="text-white">{pricePerVisit}</strong>, based on{" "}
+              {plan.visitsPerMonth} {plan.visitsPerMonth === 1 ? "visit" : "visits"} per month
+              included in the plan. This rate reflects 12-month commitment pricing.
             </Para>
             <Para>
               Payments will be processed automatically via Stripe on the{" "}
@@ -334,10 +347,40 @@ const ContractPage = () => {
               Should the Client cancel this Agreement before the end of the 12-month term, an early
               termination fee will apply in the amount of{" "}
               <strong className="text-white">one-third (1/3) of the remaining months</strong> in
-              the commitment period, in addition to payment for services already rendered.
-              For this plan, the maximum possible fee at contract start is{" "}
-              <strong className="text-white">{maxEarlyTerminationFee}</strong>.
+              the commitment period, in addition to payment for services already rendered. For this
+              plan, the maximum possible fee at contract start is{" "}
+              <strong className="text-white">{maxEarlyTerminationFee}</strong>. The table below
+              shows concrete examples at different points in the term:
             </Para>
+            <div className="mb-4 overflow-hidden rounded-xl border border-white/8">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-white/8 bg-white/5">
+                    <th className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
+                      Month completed
+                    </th>
+                    <th className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
+                      Remaining months
+                    </th>
+                    <th className="px-4 py-2.5 text-right text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
+                      Max termination fee
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {etExamples.map(({ monthCompleted, remaining, fee }) => (
+                    <tr
+                      key={monthCompleted}
+                      className="border-b border-white/5 last:border-0 odd:bg-white/2"
+                    >
+                      <td className="px-4 py-2.5 text-gray-300">{monthCompleted}</td>
+                      <td className="px-4 py-2.5 text-gray-300">{remaining}</td>
+                      <td className="px-4 py-2.5 text-right font-medium text-white">{fee}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
             <Para>
               If any discounts were applied based on the Client's commitment to the full term, the
               Service Provider reserves the right to recover the difference between the discounted
@@ -350,9 +393,50 @@ const ContractPage = () => {
             </Para>
           </section>
 
-          {/* 5. Loyalty Program */}
+          {/* 5. Definition of Services Rendered */}
           <section className="mb-8">
-            <SectionTitle>5. Loyalty &amp; Referral Program</SectionTitle>
+            <SectionTitle>5. Definition of Services Rendered</SectionTitle>
+            <Para>
+              Services are considered rendered based on the number of visits completed at the
+              Client's property as scheduled under the contracted plan, regardless of subjective
+              quality assessments. Any quality dispute must be submitted in writing to HD
+              Construction LLC within{" "}
+              <strong className="text-white">five (5) business days</strong> of the visit in
+              question. Failure to provide timely written notice shall constitute acceptance of
+              services as rendered for that visit.
+            </Para>
+            <Para>
+              Written dispute notices must be submitted through the client portal at{" "}
+              <strong className="text-white">hdproconstruction.com/dashboard</strong> or via
+              certified mail to the Service Provider's registered address. Verbal or informal
+              complaints do not constitute a formal dispute under this Agreement.
+            </Para>
+          </section>
+
+          {/* 6. Cancellation Procedure */}
+          <section className="mb-8">
+            <SectionTitle>6. Cancellation Procedure</SectionTitle>
+            <Para>
+              To cancel this Agreement, the Client must submit a cancellation request through the
+              client portal at{" "}
+              <strong className="text-white">https://hdproconstruction.com/dashboard</strong>.
+              Cancellation requests must be submitted in writing through the portal and will receive
+              a written confirmation of receipt. The cancellation is effective on the date of written
+              confirmation by the Service Provider. Cancellation requests submitted by other means
+              (phone, email, verbal) are not binding until confirmed through the portal.
+            </Para>
+            <Para>
+              In the event of cancellation, any amounts charged or collected after the effective
+              cancellation date shall be refunded to the Client within{" "}
+              <strong className="text-white">ten (10) business days</strong>. Early termination
+              fees, if applicable under Section 4, remain due and are not subject to this refund
+              provision.
+            </Para>
+          </section>
+
+          {/* 7. Loyalty Program */}
+          <section className="mb-8">
+            <SectionTitle>7. Loyalty &amp; Referral Program</SectionTitle>
             <Para>
               The Client may participate in the HD Construction referral program. For every{" "}
               <strong className="text-white">3 successful referrals</strong> — new clients who
@@ -368,9 +452,9 @@ const ContractPage = () => {
             </Para>
           </section>
 
-          {/* 6. Force Majeure */}
+          {/* 8. Force Majeure */}
           <section className="mb-8">
-            <SectionTitle>6. Force Majeure</SectionTitle>
+            <SectionTitle>8. Force Majeure</SectionTitle>
             <Para>
               Neither party shall be liable for failure or delay in performing their obligations if
               such failure or delay arises from causes beyond their reasonable control, including but
@@ -380,9 +464,9 @@ const ContractPage = () => {
             </Para>
           </section>
 
-          {/* 7. Insurance & Liability */}
+          {/* 9. Insurance & Liability */}
           <section className="mb-8">
-            <SectionTitle>7. Insurance &amp; Liability</SectionTitle>
+            <SectionTitle>9. Insurance &amp; Liability</SectionTitle>
             <Para>
               The Service Provider maintains general liability insurance and workers' compensation
               coverage as required by the Commonwealth of Massachusetts, protecting both the Client
@@ -396,25 +480,58 @@ const ContractPage = () => {
             </Para>
           </section>
 
-          {/* 8. Consumer Protection */}
+          {/* 10. Consumer Protection */}
           <section className="mb-8">
-            <SectionTitle>8. Consumer Protection — Chapter 93A</SectionTitle>
+            <SectionTitle>10. Consumer Protection — Chapter 93A</SectionTitle>
             <Para>
               This Agreement is subject to the Massachusetts Consumer Protection Act (M.G.L. Chapter
               93A), which prohibits unfair or deceptive trade practices. Clients retain all rights
               afforded under Chapter 93A, including the right to bring a civil action and seek
               damages for any violation of such rights.
             </Para>
+            <Para>
+              Clients may have access to the{" "}
+              <strong className="text-white">Residential Contractor's Guaranty Fund</strong>{" "}
+              established by M.G.L. c. 142A, § 5, which provides financial recovery of up to{" "}
+              <strong className="text-white">$25,000</strong> in the event of unresolved disputes
+              with a registered Home Improvement Contractor. Note: Homeowners who secure their own
+              building permits are excluded from Guaranty Fund provisions.
+            </Para>
           </section>
 
-          {/* 9. Governing Law */}
-          <section className="mb-4">
-            <SectionTitle>9. Governing Law</SectionTitle>
+          {/* 11. Governing Law */}
+          <section className="mb-8">
+            <SectionTitle>11. Governing Law</SectionTitle>
             <Para>
               This Agreement shall be governed by and construed in accordance with the laws of the{" "}
               <strong className="text-white">Commonwealth of Massachusetts</strong>, without regard
               to its conflict of laws provisions. Any disputes arising under this Agreement shall be
-              resolved in the appropriate courts of Massachusetts.
+              resolved in the appropriate courts of Massachusetts, subject to the arbitration
+              provisions set forth in Section 12.
+            </Para>
+          </section>
+
+          {/* 12. Arbitration Agreement */}
+          <section className="mb-4">
+            <SectionTitle>12. Arbitration Agreement (M.G.L. c. 142A)</SectionTitle>
+            <Para>
+              Any dispute arising out of or relating to this Agreement, including claims for breach
+              of contract, defective workmanship, or nonpayment of fees, shall be submitted to
+              binding arbitration administered by the{" "}
+              <strong className="text-white">
+                Office of Consumer Affairs and Business Regulation (OCABR)
+              </strong>{" "}
+              under the Home Improvement Contractor Arbitration Program, in accordance with M.G.L.
+              c. 142A. The arbitrator's decision shall be final and binding and may be entered as a
+              judgment in any court of competent jurisdiction in Massachusetts.
+            </Para>
+            <Para>
+              By separately acknowledging this clause in the acceptance section below, both parties
+              agree to waive their right to a jury trial for disputes covered by this Agreement.
+            </Para>
+            <Para>
+              This arbitration clause is executed as a separate written agreement pursuant to M.G.L.
+              c. 142A, § 4.
             </Para>
           </section>
         </div>
@@ -426,8 +543,39 @@ const ContractPage = () => {
           </p>
         )}
 
+        {/* Arbitration acknowledgment — separate signature per M.G.L. c. 142A, § 4 */}
+        <div className="mt-4 rounded-2xl border border-orange-400/20 bg-orange-400/5 p-5">
+          <p className="mb-3 text-[10px] font-black uppercase tracking-[0.25em] text-orange-300">
+            Separate Arbitration Acknowledgment — M.G.L. c. 142A, § 4
+          </p>
+          <label
+            className={`flex cursor-pointer items-start gap-3 ${
+              !hasScrolledToBottom ? "opacity-40" : ""
+            }`}
+          >
+            <div className="relative mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center">
+              <input
+                type="checkbox"
+                checked={isArbitrationChecked}
+                disabled={!hasScrolledToBottom}
+                onChange={(e) => setIsArbitrationChecked(e.target.checked)}
+                className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-orange-400/30 bg-white/5 transition checked:border-orange-500 checked:bg-orange-500 disabled:cursor-not-allowed"
+              />
+              {isArbitrationChecked && (
+                <CheckCircle2 size={14} className="pointer-events-none absolute text-white" />
+              )}
+            </div>
+            <span className="text-sm leading-relaxed text-gray-300">
+              I separately acknowledge and agree to the{" "}
+              <strong className="text-white">Arbitration Agreement in Section 12</strong>, and
+              understand that I am waiving my right to a jury trial for disputes arising under this
+              Agreement, as required by M.G.L. c. 142A, § 4.
+            </span>
+          </label>
+        </div>
+
         {/* Accept section */}
-        <div className="mt-6 rounded-3xl border border-white/10 bg-black/30 p-6 backdrop-blur-xl">
+        <div className="mt-4 rounded-3xl border border-white/10 bg-black/30 p-6 backdrop-blur-xl">
           <label
             className={`flex cursor-pointer items-start gap-3 ${
               !hasScrolledToBottom ? "opacity-40" : ""
@@ -442,10 +590,7 @@ const ContractPage = () => {
                 className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-white/20 bg-white/5 transition checked:border-orange-500 checked:bg-orange-500 disabled:cursor-not-allowed"
               />
               {isChecked && (
-                <CheckCircle2
-                  size={14}
-                  className="pointer-events-none absolute text-white"
-                />
+                <CheckCircle2 size={14} className="pointer-events-none absolute text-white" />
               )}
             </div>
             <span className="text-sm leading-relaxed text-gray-300">
@@ -466,7 +611,7 @@ const ContractPage = () => {
 
           <button
             type="button"
-            disabled={!isChecked || isSubmitting}
+            disabled={!isChecked || !isArbitrationChecked || isSubmitting}
             onClick={handleAccept}
             className="mt-5 flex w-full items-center justify-center gap-2.5 rounded-2xl bg-orange-500 px-6 py-4 text-sm font-black uppercase tracking-[0.18em] text-white shadow-lg shadow-orange-500/25 transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:opacity-40"
           >

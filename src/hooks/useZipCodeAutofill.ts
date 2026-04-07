@@ -24,6 +24,8 @@ interface UseZipCodeAutofillReturn {
 
 const ZIP_NOT_FOUND_MESSAGE =
   "ZIP code not found. Please enter city and state manually.";
+const ZIP_NOT_MASSACHUSETTS_MESSAGE =
+  "We currently only service Massachusetts. Please enter a MA ZIP code.";
 const ZIP_LOOKUP_UNAVAILABLE_MESSAGE =
   "Couldn't auto-fill this ZIP right now. Please enter city and state manually.";
 const DEFAULT_DEBOUNCE_MS = 350;
@@ -91,6 +93,11 @@ const useZipCodeAutofill = ({
 
         if (error instanceof ZipCodeLookupError && error.kind === "not_found") {
           setZipLookupMessage(ZIP_NOT_FOUND_MESSAGE);
+          return;
+        }
+
+        if (error instanceof ZipCodeLookupError && error.kind === "not_massachusetts") {
+          setZipLookupMessage(ZIP_NOT_MASSACHUSETTS_MESSAGE);
           return;
         }
 

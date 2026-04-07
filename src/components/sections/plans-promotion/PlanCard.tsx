@@ -34,8 +34,8 @@ export const PlanCard = ({
     <article
       className={`relative flex flex-col justify-between overflow-hidden p-10 transition-transform duration-300 ${
         isFeatured
-          ? "z-10 bg-gray-800 shadow-2xl ring-1 ring-orange-300/35 md:min-h-[37rem] md:scale-105"
-          : "bg-gray-800/40 hover:bg-gray-800/70 md:min-h-[35rem]"
+          ? "z-10 bg-gray-800 shadow-2xl ring-1 ring-orange-300/35 md:min-h-148 md:scale-105"
+          : "bg-gray-800/40 hover:bg-gray-800/70 md:min-h-140"
       }`}
     >
       {isCurrentPlan ? (
