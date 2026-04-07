@@ -16,7 +16,10 @@ const CheckoutPage = ({ planTier, onBack }: CheckoutPageProps) => {
   const {
     form,
     fieldErrors,
+    referralCode,
+    referralError,
     updateField,
+    updateReferralCode,
     dbPlan,
     isLoadingPlan,
     planNotFound,
@@ -139,10 +142,13 @@ const CheckoutPage = ({ planTier, onBack }: CheckoutPageProps) => {
             <CheckoutForm
               form={form}
               fieldErrors={fieldErrors}
+              referralCode={referralCode}
+              referralError={referralError}
               isSubmitting={isSubmitting}
               isLoadingPlan={isLoadingPlan}
               isPlanLoaded={!!dbPlan}
               onUpdateField={updateField}
+              onReferralCodeChange={updateReferralCode}
               onSubmitWithAddress={onFormSubmit}
               onSubmitWithoutAddress={handleSubmitWithoutAddress}
             />

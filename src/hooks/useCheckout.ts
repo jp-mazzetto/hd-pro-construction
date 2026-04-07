@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import type { SubscriptionPlan } from "../types/lib";
-import { ApiError } from "../lib/auth-client";
+import { ApiError, applyReferralCode } from "../lib/auth-client";
 import {
 	createCheckoutForSubscription,
 	createPropertyForCheckout,
@@ -41,7 +41,10 @@ export interface FieldErrors {
 export interface UseCheckoutReturn {
 	form: PropertyFormData;
 	fieldErrors: FieldErrors;
+	referralCode: string;
+	referralError: string | null;
 	updateField: (field: keyof PropertyFormData, value: string) => void;
+	updateReferralCode: (value: string) => void;
 	dbPlan: SubscriptionPlan | null;
 	isLoadingPlan: boolean;
 	planNotFound: boolean;
@@ -61,6 +64,8 @@ export const useCheckout = (planTier: string): UseCheckoutReturn => {
 	const [planNotFound, setPlanNotFound] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [referralCode, setReferralCode] = useState("");
+	const [referralError, setReferralError] = useState<string | null>(null);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -147,6 +152,53 @@ export const useCheckout = (planTier: string): UseCheckoutReturn => {
 		[fieldErrors],
 	);
 
+	const updateReferralCode = useCallback((value: string) => {
+		setReferralCode(value);
+		setReferralError(null);
+	}, []);
+
+	const normalizeReferralCode = useCallback(
+		() => referralCode.trim().toUpperCase(),
+		[referralCode],
+	);
+
+	const applyReferralIfProvided = useCallback(async (): Promise<boolean> => {
+		const normalized = normalizeReferralCode();
+
+		if (!normalized) {
+			return true;
+		}
+
+		try {
+			await applyReferralCode(normalized);
+			return true;
+		} catch (err) {
+			if (err instanceof ApiError) {
+				if (err.status === 404) {
+					setReferralError("Referral code not found. Check and try again.");
+					return false;
+				}
+
+				if (err.status === 422) {
+					setReferralError("You cannot use your own referral code.");
+					return false;
+				}
+
+				if (err.status === 409) {
+					setReferralError(
+						"This account already has a referral applied. Remove or change the code to continue.",
+					);
+					return false;
+				}
+			}
+
+			setReferralError(
+				"Failed to apply referral code. Please try again before continuing.",
+			);
+			return false;
+		}
+	}, [normalizeReferralCode]);
+
 	const createCheckout = useCallback(
 		async (propertyId?: string) => {
 			if (!dbPlan) {
@@ -168,6 +220,7 @@ export const useCheckout = (planTier: string): UseCheckoutReturn => {
 	const handleSubmitWithAddress = useCallback(async () => {
 		setError(null);
 		setFieldErrors({});
+		setReferralError(null);
 
 		const errors = validate();
 		if (Object.keys(errors).length > 0) {
@@ -178,6 +231,12 @@ export const useCheckout = (planTier: string): UseCheckoutReturn => {
 		setIsSubmitting(true);
 
 		try {
+			const referralApplied = await applyReferralIfProvided();
+			if (!referralApplied) {
+				setIsSubmitting(false);
+				return;
+			}
+
 			const property = await createPropertyForCheckout({
 				street: form.street.trim(),
 				city: form.city.trim(),
@@ -222,14 +281,21 @@ export const useCheckout = (planTier: string): UseCheckoutReturn => {
 			setError(getCheckoutErrorMessage(err));
 			setIsSubmitting(false);
 		}
-	}, [createCheckout, form, normalizedTier, validate]);
+	}, [applyReferralIfProvided, createCheckout, form, normalizedTier, validate]);
 
 	const handleSubmitWithoutAddress = useCallback(async () => {
 		setError(null);
 		setFieldErrors({});
+		setReferralError(null);
 		setIsSubmitting(true);
 
 	try {
+			const referralApplied = await applyReferralIfProvided();
+			if (!referralApplied) {
+				setIsSubmitting(false);
+				return;
+			}
+
 			await createCheckout();
 		} catch (err) {
 			if (err instanceof ApiError && err.code === "TERMS_NOT_ACCEPTED") {
@@ -240,12 +306,15 @@ export const useCheckout = (planTier: string): UseCheckoutReturn => {
 			setError(getCheckoutErrorMessage(err));
 			setIsSubmitting(false);
 		}
-	}, [createCheckout, normalizedTier]);
+	}, [applyReferralIfProvided, createCheckout, normalizedTier]);
 
 	return {
 		form,
 		fieldErrors,
+		referralCode,
+		referralError,
 		updateField,
+		updateReferralCode,
 		dbPlan,
 		isLoadingPlan,
 		planNotFound,

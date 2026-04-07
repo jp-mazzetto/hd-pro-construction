@@ -243,6 +243,18 @@ export const createCheckoutSession = (input: {
   );
 
 /**
+ * Aplica um código de indicação ao usuário autenticado.
+ *
+ * Faz `POST /api/subscription/referral/apply` com o código informado.
+ * O backend valida existência do código e regras de auto-indicação/duplicidade.
+ */
+export const applyReferralCode = (code: string) =>
+  request<{ message: string }>("/api/subscription/referral/apply", {
+    method: "POST",
+    body: JSON.stringify({ code }),
+  });
+
+/**
  * Busca todas as assinaturas do usuário autenticado.
  *
  * Faz `GET /api/subscription/subscriptions` e retorna apenas o array,

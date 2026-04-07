@@ -7,10 +7,13 @@ import useZipCodeAutofill from "../../hooks/useZipCodeAutofill";
 interface CheckoutFormProps {
 	form: PropertyFormData;
 	fieldErrors: FieldErrors;
+	referralCode: string;
+	referralError: string | null;
 	isSubmitting: boolean;
 	isLoadingPlan: boolean;
 	isPlanLoaded: boolean;
 	onUpdateField: (field: keyof PropertyFormData, value: string) => void;
+	onReferralCodeChange: (value: string) => void;
 	onSubmitWithAddress: (event: FormEvent<HTMLFormElement>) => void;
 	onSubmitWithoutAddress: () => void;
 }
@@ -28,10 +31,13 @@ const getInputClass = (hasError: boolean, centered = false) =>
 export const CheckoutForm = ({
 	form,
 	fieldErrors,
+	referralCode,
+	referralError,
 	isSubmitting,
 	isLoadingPlan,
 	isPlanLoaded,
 	onUpdateField,
+	onReferralCodeChange,
 	onSubmitWithAddress,
 	onSubmitWithoutAddress,
 }: CheckoutFormProps) => {
@@ -215,6 +221,32 @@ export const CheckoutForm = ({
 						/>
 						{fieldErrors.notes && (
 							<p className="mt-1.5 text-xs text-red-300">{fieldErrors.notes}</p>
+						)}
+					</label>
+
+					<label className="block">
+						<div className="mb-2 flex items-center justify-between gap-3">
+							<span className="text-[11px] font-black uppercase tracking-[0.28em] text-gray-400">
+								Referral code
+								<span className="ml-1 font-medium normal-case tracking-normal text-gray-500">
+									(optional)
+								</span>
+							</span>
+						</div>
+						<input
+							type="text"
+							value={referralCode}
+							onChange={(e) => onReferralCodeChange(e.target.value.toUpperCase())}
+							className={getInputClass(Boolean(referralError))}
+							placeholder="HD-ABC123"
+							maxLength={20}
+						/>
+						{referralError ? (
+							<p className="mt-1.5 text-xs text-red-300">{referralError}</p>
+						) : (
+							<p className="mt-1.5 text-xs text-gray-500">
+								If you were referred, enter the code before continuing to checkout.
+							</p>
 						)}
 					</label>
 
