@@ -100,13 +100,14 @@ export default function BillingPage() {
           );
         }
       } finally {
-        if (cancelled) return;
-        setHandledCheckoutSessionId(sessionId);
-        void loadBillingCycles();
-        const nextParams = new URLSearchParams(searchParams);
-        nextParams.delete("checkout");
-        nextParams.delete("session_id");
-        setSearchParams(nextParams, { replace: true });
+        if (!cancelled) {
+          setHandledCheckoutSessionId(sessionId);
+          void loadBillingCycles();
+          const nextParams = new URLSearchParams(searchParams);
+          nextParams.delete("checkout");
+          nextParams.delete("session_id");
+          setSearchParams(nextParams, { replace: true });
+        }
       }
     };
 
