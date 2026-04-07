@@ -31,6 +31,7 @@ export default function SubscriptionDetailPage({
   const [cancelReason, setCancelReason] = useState("");
   const [properties, setProperties] = useState<Property[]>([]);
   const [selectedPropertyId, setSelectedPropertyId] = useState("");
+  const [terminationFeeCheckoutUrl, setTerminationFeeCheckoutUrl] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -85,6 +86,7 @@ export default function SubscriptionDetailPage({
     try {
       const updated = await cancelSubscription(sub.id, cancelReason || undefined);
       setSub(updated);
+      setTerminationFeeCheckoutUrl(updated.feeCheckoutUrl);
       setShowCancelConfirm(false);
     } catch {
       setError("Failed to cancel subscription.");
@@ -115,6 +117,20 @@ export default function SubscriptionDetailPage({
   if (error || !sub) {
     return <p className="text-sm text-red-400">{error ?? "Subscription not found."}</p>;
   }
+
+  const remainingMonthsPreview = (() => {
+    const now = new Date();
+    const endDate = new Date(sub.endDate);
+    if (now >= endDate) return 0;
+    let remaining = 0;
+    const cursor = new Date(now);
+    while (cursor < endDate) {
+      remaining += 1;
+      cursor.setMonth(cursor.getMonth() + 1);
+    }
+    return remaining;
+  })();
+  const estimatedTerminationFee = Math.ceil((remainingMonthsPreview * sub.plan.priceInCents) / 3);
 
   return (
     <div className="space-y-6">
@@ -325,6 +341,33 @@ export default function SubscriptionDetailPage({
         </div>
       )}
 
+      {sub.status === "CANCELLED" && sub.terminationFeeInCents !== null && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
+          <p className="text-sm font-semibold text-amber-300">Early termination fee</p>
+          <p className="mt-1 text-xs text-slate-400">
+            Remaining months:{" "}
+            <span className="text-white">{sub.remainingCommitmentMonths ?? 0}</span>. Fee charged:
+            {" "}
+            <span className="text-white">${(sub.terminationFeeInCents / 100).toFixed(2)}</span>.
+          </p>
+          {(terminationFeeCheckoutUrl || sub.terminationFeeCheckoutSessionId) && (
+            <button
+              type="button"
+              onClick={() => {
+                if (terminationFeeCheckoutUrl) {
+                  window.location.href = terminationFeeCheckoutUrl;
+                }
+              }}
+              disabled={!terminationFeeCheckoutUrl}
+              className="mt-3 flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-amber-400 disabled:opacity-50 cursor-pointer"
+            >
+              <ExternalLink size={16} />
+              Pay termination fee
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Cancel confirmation */}
       {showCancelConfirm && (
         <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-5">
@@ -332,8 +375,12 @@ export default function SubscriptionDetailPage({
             Confirm Cancellation
           </h3>
           <p className="mb-3 text-xs text-slate-400">
-            This will cancel your subscription immediately and stop upcoming
-            scheduled services.
+            This cancels the subscription and applies an early termination fee
+            equal to one-third of the remaining months.
+          </p>
+          <p className="mb-3 text-xs text-amber-300">
+            Estimated now: {remainingMonthsPreview} remaining month(s) = $
+            {(estimatedTerminationFee / 100).toFixed(2)}.
           </p>
           <textarea
             placeholder="Reason for cancellation (optional)"

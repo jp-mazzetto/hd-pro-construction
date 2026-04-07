@@ -7,6 +7,7 @@ import type { DashboardSection } from "../types/dashboard";
 import type { DashboardRouteParams } from "../types/app";
 import useAuth from "./useAuth";
 import { buildDashboardPath, getPlanTierByName } from "../utils/navigation";
+import { fetchTermsStatus } from "../lib/auth-client";
 
 const useAppHandlers = () => {
   const navigate = useNavigate();
@@ -28,6 +29,22 @@ const useAppHandlers = () => {
     [navigate],
   );
 
+  const navigateToContractOrCheckout = useCallback(
+    async (tier: string) => {
+      try {
+        const { accepted } = await fetchTermsStatus();
+        if (accepted) {
+          void navigate(`/checkout?plan=${tier}`);
+        } else {
+          void navigate(`/contract?plan=${tier}`);
+        }
+      } catch {
+        void navigate(`/contract?plan=${tier}`);
+      }
+    },
+    [navigate],
+  );
+
   const navigateToDashboard = useCallback(
     (section: DashboardSection = "overview", params?: DashboardRouteParams) => {
       void navigate(buildDashboardPath(section, params));
@@ -44,14 +61,14 @@ const useAppHandlers = () => {
       const tier = getPlanTierByName(planName);
 
       if (session) {
-        navigateToCheckout(tier);
+        void navigateToContractOrCheckout(tier);
         return;
       }
 
       setPendingPlan(planName);
       openAuthModal();
     },
-    [session, navigateToCheckout, openAuthModal, setPendingPlan],
+    [session, navigateToContractOrCheckout, openAuthModal, setPendingPlan],
   );
 
   const handleLogin = useCallback(
@@ -65,7 +82,7 @@ const useAppHandlers = () => {
       closeAuthModal();
 
       if (pendingPlan) {
-        navigateToCheckout(getPlanTierByName(pendingPlan));
+        await navigateToContractOrCheckout(getPlanTierByName(pendingPlan));
         setPendingPlan(null);
       } else {
         navigateToDashboard("overview");
@@ -73,7 +90,7 @@ const useAppHandlers = () => {
 
       return true;
     },
-    [login, closeAuthModal, pendingPlan, navigateToCheckout, navigateToDashboard, setPendingPlan],
+    [login, closeAuthModal, pendingPlan, navigateToContractOrCheckout, navigateToDashboard, setPendingPlan],
   );
 
   return {

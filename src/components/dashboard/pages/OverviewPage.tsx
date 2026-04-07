@@ -259,7 +259,7 @@ export default function OverviewPage({
                   onClick={onNavigateToPlans}
                   className="rounded-lg border border-orange-400/40 bg-orange-500/10 px-3 py-2 text-xs font-bold text-orange-200 hover:bg-orange-500/20 cursor-pointer"
                 >
-                  Adicionar um novo plano a um novo endereço.
+                  Add a new plan to a new address.
                 </button>
               )}
             </div>

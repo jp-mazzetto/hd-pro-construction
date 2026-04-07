@@ -8,7 +8,12 @@ import type {
   ServiceVisit,
   UpdateProfileInput,
 } from "../types/dashboard";
-import type { Property, CreatePropertyInput, UserSubscription } from "../types/lib";
+import type {
+  CancelSubscriptionResponse,
+  CreatePropertyInput,
+  Property,
+  UserSubscription,
+} from "../types/lib";
 import { ApiError } from "./auth-client";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ?? "";
@@ -72,7 +77,7 @@ export const fetchSubscription = (id: string) =>
   });
 
 export const cancelSubscription = (id: string, reason?: string) =>
-  request<UserSubscription>(
+  request<CancelSubscriptionResponse>(
     `/api/subscription/subscriptions/${id}/cancel`,
     {
       method: "PATCH",

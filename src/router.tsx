@@ -7,6 +7,7 @@ import HomePage from "./pages/HomePage";
 import PlansPage from "./pages/PlansPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import CheckoutResultPage from "./pages/CheckoutResultPage";
+import ContractPage from "./pages/ContractPage";
 import DashboardPage from "./pages/DashboardPage";
 import AdminPage from "./pages/AdminPage";
 
@@ -17,6 +18,7 @@ const router = createBrowserRouter([
       // Public routes
       { path: "/", element: <HomePage /> },
       { path: "/plans", element: <PlansPage /> },
+      { path: "/contract", element: <ContractPage /> },
       { path: "/checkout", element: <CheckoutPage /> },
       { path: "/success", element: <CheckoutResultPage status="success" /> },
       { path: "/cancel", element: <CheckoutResultPage status="cancel" /> },

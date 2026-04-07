@@ -189,6 +189,12 @@ export const useCheckout = (planTier: string): UseCheckoutReturn => {
 
 			await createCheckout(property.id);
 		} catch (err) {
+			if (err instanceof ApiError && err.code === "TERMS_NOT_ACCEPTED") {
+				const tier = normalizedTier?.toLowerCase();
+				window.location.href = tier ? `/contract?plan=${tier}` : "/plans";
+				return;
+			}
+
 			if (
 				err instanceof ApiError &&
 				err.status === 404 &&
@@ -223,13 +229,18 @@ export const useCheckout = (planTier: string): UseCheckoutReturn => {
 		setFieldErrors({});
 		setIsSubmitting(true);
 
-		try {
+	try {
 			await createCheckout();
 		} catch (err) {
+			if (err instanceof ApiError && err.code === "TERMS_NOT_ACCEPTED") {
+				const tier = normalizedTier?.toLowerCase();
+				window.location.href = tier ? `/contract?plan=${tier}` : "/plans";
+				return;
+			}
 			setError(getCheckoutErrorMessage(err));
 			setIsSubmitting(false);
 		}
-	}, [createCheckout]);
+	}, [createCheckout, normalizedTier]);
 
 	return {
 		form,

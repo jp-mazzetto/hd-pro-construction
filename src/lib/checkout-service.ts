@@ -93,6 +93,9 @@ export interface CheckoutServiceError {
  */
 export const getCheckoutErrorMessage = (error: unknown): string => {
     if (error instanceof ApiError) {
+        if (error.code === "TERMS_NOT_ACCEPTED") {
+            return "You must accept the contract terms before starting checkout.";
+        }
         return error.message;
     }
     return "Something went wrong. Please try again.";

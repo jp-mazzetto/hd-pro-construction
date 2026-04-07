@@ -132,7 +132,7 @@ const getPlanCtaLabel = ({
   }
 
   if (hasSubscription) {
-    return "Adicionar um novo plano a um novo endereço";
+    return "Add a new plan to a new address";
   }
 
   if (isStandard) {

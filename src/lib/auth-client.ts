@@ -17,6 +17,7 @@ export type { SubscriptionStatus, UserSubscription };
 
 type ErrorResponse = {
   message?: string;
+  code?: string;
 };
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ?? "";
@@ -41,11 +42,13 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ?? ""
  */
 export class ApiError extends Error {
   status: number;
+  code?: string;
 
-  constructor(message: string, status: number) {
+  constructor(message: string, status: number, code?: string) {
     super(message);
     this.name = "ApiError";
     this.status = status;
+    this.code = code;
   }
 }
 
@@ -101,8 +104,15 @@ const request = async <T>(
       typeof (data as ErrorResponse).message === "string"
         ? ((data as ErrorResponse).message ?? "Unexpected API error")
         : "Unexpected API error";
+    const parsedCode: string | undefined =
+      typeof data === "object" &&
+      data !== null &&
+      "code" in data &&
+      typeof (data as ErrorResponse).code === "string"
+        ? (data as ErrorResponse).code
+        : undefined;
 
-    throw new ApiError(parsedMessage, response.status);
+    throw new ApiError(parsedMessage, response.status, parsedCode);
   }
 
   return data as T;
@@ -163,6 +173,23 @@ export const getGoogleAuthStartUrl = () => `${API_BASE_URL}/api/auth/google/star
  */
 export const logoutCurrentSession = () =>
   request<void>("/api/auth/logout", {
+    method: "POST",
+  });
+
+/**
+ * Verifica se o usuário autenticado já aceitou os termos na versão atual.
+ */
+export const fetchTermsStatus = () =>
+  request<{ accepted: boolean; version: string }>("/api/terms/status", {
+    method: "GET",
+  });
+
+/**
+ * Registra o aceite dos termos pelo usuário autenticado.
+ * O IP é capturado no servidor a partir do request.
+ */
+export const acceptTerms = () =>
+  request<{ accepted: boolean; version: string }>("/api/terms/accept", {
     method: "POST",
   });
 

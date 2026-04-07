@@ -69,7 +69,19 @@ export interface UserSubscription {
   endDate: string;
   cancelledAt: string | null;
   cancellationReason: string | null;
+  effectiveCancelDate: string | null;
+  remainingCommitmentMonths: number | null;
+  terminationFeeInCents: number | null;
+  terminationFeeCheckoutSessionId: string | null;
   createdAt: string;
   plan: SubscriptionPlan;
   property: SubscriptionPropertySummary | null;
+}
+
+export interface CancelSubscriptionResponse extends UserSubscription {
+  remainingMonths: number;
+  terminationFeeInCents: number;
+  effectiveCancelDate: string;
+  feeCheckoutUrl: string | null;
+  feeCheckoutSessionId: string | null;
 }
