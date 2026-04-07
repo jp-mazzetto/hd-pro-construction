@@ -13,12 +13,33 @@ interface ServiceCardProps {
 const ServiceCard = ({ service, onRequest }: ServiceCardProps) => {
   return (
     <article className="group relative isolate min-h-96 overflow-hidden rounded-4xl bg-gray-900 shadow-xl transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl">
-      <img
-        src={service.imageSrc}
-        alt={service.imageAlt}
-        loading="lazy"
-        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-      />
+      {service.imageBefore && service.imageAfter ? (
+        <div className="absolute inset-0 flex gap-1 bg-gray-50">
+          <div className="relative w-1/2 overflow-hidden">
+            <img
+              src={service.imageBefore}
+              alt={`${service.imageAlt} — before`}
+              loading="lazy"
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+          </div>
+          <div className="relative w-1/2 overflow-hidden">
+            <img
+              src={service.imageAfter}
+              alt={`${service.imageAlt} — after`}
+              loading="lazy"
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+          </div>
+        </div>
+      ) : (
+        <img
+          src={service.imageSrc}
+          alt={service.imageAlt}
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+      )}
 
       <div className="absolute inset-0 bg-linear-to-t from-gray-950 via-gray-900/65 to-gray-950/20 transition-all duration-500 group-hover:from-gray-950/95 group-hover:via-gray-900/50" />
 

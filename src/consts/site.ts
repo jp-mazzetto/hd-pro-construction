@@ -3,15 +3,21 @@ import img2 from "../assets/imgs/img2.webp";
 import img3 from "../assets/imgs/img3.webp";
 import img4 from "../assets/imgs/img4.webp";
 import img5 from "../assets/imgs/img5.webp";
-import backyardPaverPatioFence from "../assets/imgs/services/backyard-paver-patio-fence.jpeg";
 import brickWalkwayBeforeAfterMilton from "../assets/imgs/services/brick-walkway-before-after-milton.jpeg";
 import deckPatioRenovation from "../assets/imgs/services/deck-patio-renovation.jpeg";
 import paintedHouseCurvedWalkway from "../assets/imgs/services/painted-house-curved-walkway.jpeg";
-import paverDrivewayInstallation from "../assets/imgs/services/paver-driveway-installation.jpeg";
-import paverInstallationTeam from "../assets/imgs/services/paver-installation-team.jpeg";
-import paversBeforeAfterQuincy from "../assets/imgs/services/pavers-before-after-quincy.jpeg";
-import walkwayFrontEntry from "../assets/imgs/services/walkway-front-entry.jpeg";
-import walkwayLinearGrayPavers from "../assets/imgs/services/walkway-linear-gray-pavers.jpeg";
+import excavationBeforeImg from "../assets/imgs/services/excavation/before.png";
+import excavationAfterImg from "../assets/imgs/services/excavation/after.png";
+import fencesBeforeImg from "../assets/imgs/services/fences/before.png";
+import fencesAfterImg from "../assets/imgs/services/fences/after.png";
+import landscapeBeforeImg from "../assets/imgs/services/landscape/before.png";
+import landscapeAfterImg from "../assets/imgs/services/landscape/after.png";
+import paversBeforeImg from "../assets/imgs/services/pavers/before.png";
+import paversAfterImg from "../assets/imgs/services/pavers/after.png";
+import stoneWallsBeforeImg from "../assets/imgs/services/stonewalls/before.png";
+import stoneWallsAfterImg from "../assets/imgs/services/stonewalls/after.png";
+import walkwaysBeforeImg from "../assets/imgs/services/walkweys/before.png";
+import walkwaysAfterImg from "../assets/imgs/services/walkweys/after.png";
 
 export type ServiceName =
   | "Pavers"
@@ -35,6 +41,8 @@ export interface Service {
   desc: string;
   imageSrc: string;
   imageAlt: string;
+  imageBefore?: string;
+  imageAfter?: string;
 }
 
 export type SubscriptionPlanName = "Basic Plan" | "Standard Plan" | "Premium Plan";
@@ -314,8 +322,10 @@ export const SERVICES: Service[] = [
   {
     title: "Pavers",
     desc: "Expert installation of interlocking concrete and stone pavers.",
-    imageSrc: paversBeforeAfterQuincy,
-    imageAlt: "Before and after paver walkway renovation in Quincy, Massachusetts.",
+    imageSrc: paversBeforeImg,
+    imageAlt: "Paver installation service.",
+    imageBefore: paversBeforeImg,
+    imageAfter: paversAfterImg,
   },
   {
     title: "Brick Work",
@@ -326,26 +336,34 @@ export const SERVICES: Service[] = [
   {
     title: "Walkways",
     desc: "Beautifully designed paths that add value to your property.",
-    imageSrc: walkwayFrontEntry,
-    imageAlt: "Finished front-entry walkway with pavers and dark border.",
+    imageSrc: walkwaysBeforeImg,
+    imageAlt: "Walkway installation service.",
+    imageBefore: walkwaysBeforeImg,
+    imageAfter: walkwaysAfterImg,
   },
   {
     title: "Stone Walls",
     desc: "Robust and aesthetic natural stone retaining walls.",
-    imageSrc: paverDrivewayInstallation,
-    imageAlt: "Large paver installation area with stacked stone and border detailing.",
+    imageSrc: stoneWallsBeforeImg,
+    imageAlt: "Stone walls construction service.",
+    imageBefore: stoneWallsBeforeImg,
+    imageAfter: stoneWallsAfterImg,
   },
   {
     title: "Excavation",
     desc: "Precision site clearing, grading, and earth moving.",
-    imageSrc: paverInstallationTeam,
-    imageAlt: "Contractor leveling a base during a paver installation project.",
+    imageSrc: excavationBeforeImg,
+    imageAlt: "Excavation service.",
+    imageBefore: excavationBeforeImg,
+    imageAfter: excavationAfterImg,
   },
   {
     title: "Fences",
     desc: "Quality residential and commercial fencing solutions.",
-    imageSrc: backyardPaverPatioFence,
-    imageAlt: "Backyard patio paving project with a newly installed perimeter fence.",
+    imageSrc: fencesBeforeImg,
+    imageAlt: "Fence installation service.",
+    imageBefore: fencesBeforeImg,
+    imageAfter: fencesAfterImg,
   },
   {
     title: "Paint",
@@ -356,8 +374,10 @@ export const SERVICES: Service[] = [
   {
     title: "Landscape",
     desc: "Full-service landscape design and maintenance to create your dream outdoor oasis.",
-    imageSrc: walkwayLinearGrayPavers,
-    imageAlt: "Long landscaped paver walkway crossing a front yard.",
+    imageSrc: landscapeBeforeImg,
+    imageAlt: "Landscape service.",
+    imageBefore: landscapeBeforeImg,
+    imageAfter: landscapeAfterImg,
   },
   {
     title: "Deck",
