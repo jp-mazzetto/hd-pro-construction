@@ -10,6 +10,8 @@ interface BillingTableRowProps {
   onResolve?: (cycle: BillingCycleView) => void;
   /** Called when the user clicks "Pay in Advance" on a PENDING cycle */
   onPayInAdvance?: (cycle: BillingCycleView) => void;
+  /** Whether pay in advance action is available for this cycle */
+  canPayInAdvance?: boolean;
   /** Loading state for pay in advance redirect */
   isPayInAdvanceLoading?: boolean;
 }
@@ -52,6 +54,7 @@ export default function BillingTableRow({
   cycle,
   onResolve,
   onPayInAdvance,
+  canPayInAdvance = true,
   isPayInAdvanceLoading = false,
 }: BillingTableRowProps) {
   const amount = (cycle.amountInCents / 100).toLocaleString("en-US", {
@@ -101,15 +104,17 @@ export default function BillingTableRow({
         )}
 
         {cycle.status === "PENDING" && (
-          <button
-            type="button"
-            disabled={isPayInAdvanceLoading}
-            onClick={() => onPayInAdvance?.(cycle)}
-            className="ml-auto inline-flex items-center gap-2 rounded-xl bg-orange-600 px-4 py-2 text-xs font-bold text-white hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <ArrowRight size={13} />
-            {isPayInAdvanceLoading ? "Redirecting..." : "Pay in Advance"}
-          </button>
+          canPayInAdvance && (
+            <button
+              type="button"
+              disabled={isPayInAdvanceLoading}
+              onClick={() => onPayInAdvance?.(cycle)}
+              className="ml-auto inline-flex items-center gap-2 rounded-xl bg-orange-600 px-4 py-2 text-xs font-bold text-white hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <ArrowRight size={13} />
+              {isPayInAdvanceLoading ? "Redirecting..." : "Pay in Advance"}
+            </button>
+          )
         )}
       </td>
     </tr>

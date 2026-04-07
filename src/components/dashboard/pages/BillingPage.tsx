@@ -170,6 +170,13 @@ export default function BillingPage() {
   );
 
   const activeProjectName = nextPaymentCycle?.planName ?? undefined;
+  const nextPayableCycleId = useMemo(
+    () =>
+      cycles
+        .filter((c) => c.status === "OVERDUE" || c.status === "PENDING")
+        .sort((a, b) => a.periodStart.localeCompare(b.periodStart))[0]?.id ?? null,
+    [cycles],
+  );
 
   /* ── Loading skeleton ─────────────────────────────────────────────────── */
 
@@ -308,6 +315,7 @@ export default function BillingPage() {
                     key={cycle.id}
                     cycle={cycle}
                     onPayInAdvance={handlePayInAdvance}
+                    canPayInAdvance={cycle.id === nextPayableCycleId}
                     isPayInAdvanceLoading={payingCycleId === cycle.id}
                   />
                 ))
