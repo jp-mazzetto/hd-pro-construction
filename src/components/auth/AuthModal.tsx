@@ -326,6 +326,8 @@ const AuthModal = ({
                         Full name
                       </span>
                       <input
+                        id="auth-name"
+                        name="name"
                         type="text"
                         value={formState.name}
                         onChange={(event) =>
@@ -347,6 +349,8 @@ const AuthModal = ({
                       Email
                     </span>
                     <input
+                      id="auth-email"
+                      name="email"
                       type="email"
                       value={formState.email}
                       onChange={(event) =>
@@ -368,6 +372,8 @@ const AuthModal = ({
                     </span>
                     <div className="relative">
                       <input
+                        id="auth-password"
+                        name="password"
                         type={showPassword ? "text" : "password"}
                         value={formState.password}
                         onChange={(event) =>
@@ -403,6 +409,8 @@ const AuthModal = ({
                       </span>
                       <div className="relative">
                         <input
+                          id="auth-confirm-password"
+                          name="confirmPassword"
                           type={showConfirmPassword ? "text" : "password"}
                           value={formState.confirmPassword}
                           onChange={(event) =>

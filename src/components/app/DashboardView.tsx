@@ -1,4 +1,3 @@
-import AppSeo from "../AppSeo";
 import DashboardLayout from "../dashboard/DashboardLayout";
 import type { DashboardRouteParams, NavigateToDashboard } from "../../types/app";
 import type { AuthSession } from "../../types/auth";
@@ -27,12 +26,7 @@ const DashboardView = ({
   onLogout,
 }: DashboardViewProps) => {
   if (isAuthLoading) {
-    return (
-      <>
-        <AppSeo />
-        <div className="min-h-screen bg-slate-950" />
-      </>
-    );
+    return <div className="min-h-screen bg-slate-950" />;
   }
 
   if (!session) {
@@ -40,24 +34,21 @@ const DashboardView = ({
   }
 
   return (
-    <>
-      <AppSeo />
-      <DashboardLayout
+    <DashboardLayout
+      session={session}
+      currentSection={section}
+      onNavigate={onNavigate}
+      onGoHome={onGoHome}
+      onLogout={onLogout}
+    >
+      <DashboardPageContent
         session={session}
-        currentSection={section}
+        section={section}
+        params={params}
         onNavigate={onNavigate}
-        onGoHome={onGoHome}
-        onLogout={onLogout}
-      >
-        <DashboardPageContent
-          session={session}
-          section={section}
-          params={params}
-          onNavigate={onNavigate}
-          onNavigateToPlans={onNavigateToPlans}
-        />
-      </DashboardLayout>
-    </>
+        onNavigateToPlans={onNavigateToPlans}
+      />
+    </DashboardLayout>
   );
 };
 

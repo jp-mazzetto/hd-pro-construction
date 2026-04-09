@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import type { SubscriptionPlanName } from "../consts/site";
 import type { LoginInput } from "../types/auth";
@@ -11,6 +11,7 @@ import { fetchTermsStatus } from "../lib/auth-client";
 
 const useAppHandlers = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { session, openAuthModal, closeAuthModal, login, pendingPlan, setPendingPlan } =
     useAuth();
 
@@ -89,12 +90,17 @@ const useAppHandlers = () => {
         await navigateToContractOrCheckout(getPlanTierByName(pendingPlan));
         setPendingPlan(null);
       } else {
-        navigateToDashboard("overview");
+        const from = (location.state as { from?: string } | null)?.from;
+        if (from && from !== "/") {
+          void navigate(from, { replace: true });
+        } else {
+          navigateToDashboard("overview");
+        }
       }
 
       return true;
     },
-    [login, closeAuthModal, pendingPlan, navigateToContractOrCheckout, navigateToDashboard, setPendingPlan],
+    [login, closeAuthModal, pendingPlan, navigateToContractOrCheckout, navigateToDashboard, setPendingPlan, location.state, navigate],
   );
 
   return {

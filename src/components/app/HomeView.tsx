@@ -1,4 +1,3 @@
-import AppSeo from "../AppSeo";
 import CheckoutResult from "../CheckoutResult";
 import MobileMenu from "../layout/MobileMenu";
 import SiteFooter from "../layout/SiteFooter";
@@ -55,7 +54,6 @@ const HomeView = ({
   onCheckoutResultScheduleSetup,
 }: HomeViewProps) => (
   <>
-    <AppSeo />
     <div className="min-h-screen overflow-x-hidden bg-white font-sans text-gray-900 selection:bg-orange-600 selection:text-white">
       {!scrolled && (
         <div className="bg-orange-600 text-white text-center text-xs font-bold uppercase tracking-widest py-2 px-4">

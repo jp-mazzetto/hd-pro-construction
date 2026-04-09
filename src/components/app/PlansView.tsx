@@ -2,7 +2,6 @@ import type { NavItem, SubscriptionPlanName } from "../../consts/site";
 import { LAWN_MAINTENANCE_PLANS } from "../../consts/site";
 import { usePlansPromotionSection } from "../../hooks/usePlansPromotionSection";
 import type { UserSubscription } from "../../types/lib";
-import AppSeo from "../AppSeo";
 import MobileMenu from "../layout/MobileMenu";
 import SiteFooter from "../layout/SiteFooter";
 import SiteHeader from "../layout/SiteHeader";
@@ -49,7 +48,6 @@ const PlansView = ({
 
   return (
     <>
-      <AppSeo />
       <div className="min-h-screen overflow-x-hidden bg-gray-900 font-sans text-gray-900 selection:bg-orange-600 selection:text-white">
         <SiteHeader
           scrolled={scrolled}

@@ -1,11 +1,14 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 import useAuth from "../hooks/useAuth";
 import useAppHandlers from "../hooks/useAppHandlers";
 import useAuthUrlEffects from "../hooks/useAuthUrlEffects";
+import AppSeo from "../components/AppSeo";
 import AppAuthModal from "../components/app/AppAuthModal";
+import { getSeoConfig } from "../consts/seo";
 
 const RootContent = () => {
+  const { pathname } = useLocation();
   const {
     session,
     isAuthLoading,
@@ -30,8 +33,11 @@ const RootContent = () => {
     setAuthNotice,
   });
 
+  const seoConfig = getSeoConfig(pathname);
+
   return (
     <>
+      <AppSeo {...seoConfig} />
       <Outlet />
       <AppAuthModal
         isOpen={isAuthModalOpen}

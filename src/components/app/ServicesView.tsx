@@ -11,7 +11,6 @@ import type {
 import { LAWN_MAINTENANCE_PLANS, SERVICES } from "../../consts/site";
 import { usePlansPromotionSection } from "../../hooks/usePlansPromotionSection";
 import type { UserSubscription } from "../../types/lib";
-import AppSeo from "../AppSeo";
 import MobileMenu from "../layout/MobileMenu";
 import SiteFooter from "../layout/SiteFooter";
 import SiteHeader from "../layout/SiteHeader";
@@ -150,7 +149,6 @@ const ServicesView = ({
 
   return (
     <>
-      <AppSeo />
       <div className="min-h-screen overflow-x-hidden bg-slate-950 font-sans text-gray-100 selection:bg-orange-600 selection:text-white">
         <SiteHeader
           scrolled={scrolled}

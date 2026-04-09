@@ -2,7 +2,6 @@ import { useParams } from "react-router-dom";
 
 import useAuth from "../hooks/useAuth";
 import useAppHandlers from "../hooks/useAppHandlers";
-import AppSeo from "../components/AppSeo";
 import DashboardView from "../components/app/DashboardView";
 import type { DashboardSection } from "../types/dashboard";
 
@@ -20,12 +19,7 @@ const DashboardPage = ({ section: sectionOverride }: DashboardPageProps) => {
   const routeParams = params.id ? { id: params.id } : undefined;
 
   if (isAuthLoading) {
-    return (
-      <>
-        <AppSeo />
-        <div className="min-h-screen bg-slate-950" />
-      </>
-    );
+    return <div className="min-h-screen bg-slate-950" />;
   }
 
   if (!session) {

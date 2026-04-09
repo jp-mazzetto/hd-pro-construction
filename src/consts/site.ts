@@ -142,6 +142,14 @@ export const LOCAL_BUSINESS_SCHEMA = {
   logo: `${SITE_URL}/logo.webp`,
   description:
     "HD Pro Construction INC is a mobile, on-site construction and landscaping company serving residential customers throughout Greater Boston, MA. We come to your home to install pavers, brick work, walkways, stone walls, fences, decks, and more.",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Greater Boston Area",
+    addressLocality: "Boston",
+    addressRegion: "MA",
+    postalCode: "02108",
+    addressCountry: "US",
+  },
   serviceArea: {
     "@type": "GeoCircle",
     geoMidpoint: {

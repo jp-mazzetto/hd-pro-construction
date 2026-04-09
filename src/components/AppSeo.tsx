@@ -1,69 +1,73 @@
 import { Helmet } from "react-helmet-async";
 
 import {
-  LOCAL_BUSINESS_SCHEMA,
-  SEO_DESCRIPTION,
-  SEO_KEYWORDS,
-  SEO_TITLE,
-  SITE_NAME,
-  SITE_URL,
-} from "../consts/site";
+  DEFAULT_LOCALE,
+  DEFAULT_OG_IMAGE_PATH,
+  INDEX_ROBOTS,
+  getCanonicalUrl,
+  type SeoConfig,
+} from "../consts/seo";
+import { SITE_NAME, SITE_URL } from "../consts/site";
 
-/**
- * Configura metadados SEO, Open Graph, Twitter Card e JSON-LD LocalBusiness
- * da landing page para máxima indexação no Google.
- */
-const AppSeo = () => (
-  <Helmet>
-    {/* ── Primary ── */}
-    <title>{SEO_TITLE}</title>
-    <meta name="description" content={SEO_DESCRIPTION} />
-    <meta name="keywords" content={SEO_KEYWORDS} />
-    <link rel="canonical" href={`${SITE_URL}/`} />
+type AppSeoProps = SeoConfig;
 
-    {/* ── Robots ── */}
-    <meta
-      name="robots"
-      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
-    />
+const AppSeo = ({
+  title,
+  description,
+  canonicalPath,
+  keywords,
+  robots = INDEX_ROBOTS,
+  imagePath = DEFAULT_OG_IMAGE_PATH,
+  imageAlt = title,
+  locale = DEFAULT_LOCALE,
+  ogType = "website",
+  structuredData = [],
+}: AppSeoProps) => {
+  if ((globalThis as { __HD_PRERENDER__?: boolean }).__HD_PRERENDER__) {
+    return null;
+  }
 
-    {/* ── Geo ── */}
-    <meta name="geo.region" content="US-MA" />
-    <meta name="geo.placename" content="Greater Boston, Massachusetts" />
-    <meta name="geo.position" content="42.3601;-71.0589" />
-    <meta name="ICBM" content="42.3601, -71.0589" />
+  const canonicalUrl = getCanonicalUrl(canonicalPath);
+  const imageUrl = imagePath.startsWith("http") ? imagePath : `${SITE_URL}${imagePath}`;
 
-    {/* ── Open Graph ── */}
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content={SITE_NAME} />
-    <meta property="og:url" content={`${SITE_URL}/`} />
-    <meta property="og:title" content={SEO_TITLE} />
-    <meta property="og:description" content={SEO_DESCRIPTION} />
-    <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta
-      property="og:image:alt"
-      content="HD Pro Construction – On-site Pavers and Masonry in Boston, MA"
-    />
-    <meta property="og:locale" content="en_US" />
+  return (
+    <Helmet>
+      <title>{title}</title>
+      <meta name="description" content={description} />
+      {keywords ? <meta name="keywords" content={keywords} /> : null}
+      <meta name="robots" content={robots} />
+      <link rel="canonical" href={canonicalUrl} />
 
-    {/* ── Twitter Card ── */}
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content={`${SITE_URL}/`} />
-    <meta name="twitter:title" content={SEO_TITLE} />
-    <meta name="twitter:description" content={SEO_DESCRIPTION} />
-    <meta name="twitter:image" content={`${SITE_URL}/og-image.jpg`} />
-    <meta
-      name="twitter:image:alt"
-      content="HD Pro Construction – On-site Pavers and Masonry in Boston, MA"
-    />
+      <meta name="geo.region" content="US-MA" />
+      <meta name="geo.placename" content="Greater Boston, Massachusetts" />
+      <meta name="geo.position" content="42.3601;-71.0589" />
+      <meta name="ICBM" content="42.3601, -71.0589" />
 
-    {/* ── JSON-LD LocalBusiness Schema ── */}
-    <script type="application/ld+json">
-      {JSON.stringify(LOCAL_BUSINESS_SCHEMA)}
-    </script>
-  </Helmet>
-);
+      <meta property="og:type" content={ogType} />
+      <meta property="og:site_name" content={SITE_NAME} />
+      <meta property="og:url" content={canonicalUrl} />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:image" content={imageUrl} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta property="og:image:alt" content={imageAlt} />
+      <meta property="og:locale" content={locale} />
+
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:url" content={canonicalUrl} />
+      <meta name="twitter:title" content={title} />
+      <meta name="twitter:description" content={description} />
+      <meta name="twitter:image" content={imageUrl} />
+      <meta name="twitter:image:alt" content={imageAlt} />
+
+      {structuredData.map((entry, index) => (
+        <script key={`${canonicalPath}-jsonld-${index}`} type="application/ld+json">
+          {JSON.stringify(entry)}
+        </script>
+      ))}
+    </Helmet>
+  );
+};
 
 export default AppSeo;

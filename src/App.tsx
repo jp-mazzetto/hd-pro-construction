@@ -1,6 +1,10 @@
+import { useMemo } from "react";
 import { RouterProvider } from "react-router-dom";
-import router from "./router";
+import { createAppBrowserRouter } from "./router";
 
-const App = () => <RouterProvider router={router} />;
+const App = () => {
+  const router = useMemo(() => createAppBrowserRouter(), []);
+  return <RouterProvider router={router} />;
+};
 
 export default App;
