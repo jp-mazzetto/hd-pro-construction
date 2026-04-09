@@ -4,6 +4,7 @@ import { REFERRAL_PROMOTION } from "../../../consts/site";
 
 interface ReferralPromotionCardProps {
   hasSubscription: boolean;
+  onActionClick: () => void;
 }
 
 /**
@@ -11,6 +12,7 @@ interface ReferralPromotionCardProps {
  */
 export const ReferralPromotionCard = ({
   hasSubscription,
+  onActionClick,
 }: ReferralPromotionCardProps) => (
   <div className="rounded-2xl border border-gray-700/50 bg-gray-800/50 p-2">
     <div className="flex flex-col items-center justify-between gap-8 rounded-xl border border-gray-700/30 bg-gray-800/40 px-8 py-10 md:flex-row md:px-12 md:py-12">
@@ -36,6 +38,7 @@ export const ReferralPromotionCard = ({
 
       <button
         type="button"
+        onClick={onActionClick}
         className="inline-flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-lg bg-orange-700 px-8 py-4 font-bold text-orange-50 shadow-xl transition-transform duration-200 hover:scale-105 hover:bg-orange-800 active:scale-95"
       >
         <ArrowRightLeft size={18} />

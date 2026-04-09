@@ -58,7 +58,6 @@ const ContractPage = () => {
 
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
-  const [isArbitrationChecked, setIsArbitrationChecked] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -113,7 +112,7 @@ const ContractPage = () => {
   };
 
   const handleAccept = async () => {
-    if (!isChecked || !isArbitrationChecked || isSubmitting) return;
+    if (!isChecked || isSubmitting) return;
     setIsSubmitting(true);
     setSubmitError(null);
     try {
@@ -526,12 +525,22 @@ const ContractPage = () => {
               judgment in any court of competent jurisdiction in Massachusetts.
             </Para>
             <Para>
-              By separately acknowledging this clause in the acceptance section below, both parties
-              agree to waive their right to a jury trial for disputes covered by this Agreement.
+              The parties acknowledge that disputes covered by this clause are subject to binding
+              arbitration and waive the right to a jury trial as permitted by applicable law.
+            </Para>
+          </section>
+
+          {/* 13. Separate Arbitration Acknowledgment */}
+          <section>
+            <SectionTitle>13. Separate Arbitration Acknowledgment (M.G.L. c. 142A, § 4)</SectionTitle>
+            <Para>
+              The Client separately acknowledges and agrees to the Arbitration Agreement in Section
+              12 and understands that disputes covered by this Agreement will be resolved through
+              binding arbitration rather than by jury trial.
             </Para>
             <Para>
-              This arbitration clause is executed as a separate written agreement pursuant to M.G.L.
-              c. 142A, § 4.
+              This provision is intended to satisfy any separate written acknowledgment requirement
+              under M.G.L. c. 142A, § 4 and is incorporated into this Service Agreement.
             </Para>
           </section>
         </div>
@@ -542,37 +551,6 @@ const ContractPage = () => {
             Scroll to the bottom of the contract to enable acceptance
           </p>
         )}
-
-        {/* Arbitration acknowledgment — separate signature per M.G.L. c. 142A, § 4 */}
-        <div className="mt-4 rounded-2xl border border-orange-400/20 bg-orange-400/5 p-5">
-          <p className="mb-3 text-[10px] font-black uppercase tracking-[0.25em] text-orange-300">
-            Separate Arbitration Acknowledgment — M.G.L. c. 142A, § 4
-          </p>
-          <label
-            className={`flex cursor-pointer items-start gap-3 ${
-              !hasScrolledToBottom ? "opacity-40" : ""
-            }`}
-          >
-            <div className="relative mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center">
-              <input
-                type="checkbox"
-                checked={isArbitrationChecked}
-                disabled={!hasScrolledToBottom}
-                onChange={(e) => setIsArbitrationChecked(e.target.checked)}
-                className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-orange-400/30 bg-white/5 transition checked:border-orange-500 checked:bg-orange-500 disabled:cursor-not-allowed"
-              />
-              {isArbitrationChecked && (
-                <CheckCircle2 size={14} className="pointer-events-none absolute text-white" />
-              )}
-            </div>
-            <span className="text-sm leading-relaxed text-gray-300">
-              I separately acknowledge and agree to the{" "}
-              <strong className="text-white">Arbitration Agreement in Section 12</strong>, and
-              understand that I am waiving my right to a jury trial for disputes arising under this
-              Agreement, as required by M.G.L. c. 142A, § 4.
-            </span>
-          </label>
-        </div>
 
         {/* Accept section */}
         <div className="mt-4 rounded-3xl border border-white/10 bg-black/30 p-6 backdrop-blur-xl">
@@ -597,8 +575,10 @@ const ContractPage = () => {
               I have read, understood, and agree to the terms of this Service Agreement, including the{" "}
               <strong className="text-white">12-month commitment</strong>,{" "}
               <strong className="text-white">automatic monthly billing</strong>, and the{" "}
-              <strong className="text-white">early termination fee</strong> as described above. I
-              acknowledge my right to cancel within three business days without penalty.
+              <strong className="text-white">early termination fee</strong> as described above,
+              including the <strong className="text-white">Arbitration Agreement (Section 12)</strong>{" "}
+              and <strong className="text-white">Section 13</strong>. I acknowledge my right to
+              cancel within three business days without penalty.
             </span>
           </label>
 
@@ -611,7 +591,7 @@ const ContractPage = () => {
 
           <button
             type="button"
-            disabled={!isChecked || !isArbitrationChecked || isSubmitting}
+            disabled={!isChecked || isSubmitting}
             onClick={handleAccept}
             className="mt-5 flex w-full items-center justify-center gap-2.5 rounded-2xl bg-orange-500 px-6 py-4 text-sm font-black uppercase tracking-[0.18em] text-white shadow-lg shadow-orange-500/25 transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:opacity-40"
           >

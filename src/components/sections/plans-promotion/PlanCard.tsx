@@ -92,7 +92,7 @@ export const PlanCard = ({
 
       {hasSubscription && !isCurrentPlan && (
         <p className="mt-3 text-center text-xs text-gray-500">
-          We will open a new checkout flow to confirm the plan change.
+          We will open a checkout flow to create a plan for another address.
         </p>
       )}
     </article>
@@ -132,7 +132,7 @@ const getPlanCtaLabel = ({
   }
 
   if (hasSubscription) {
-    return "Add a new plan to a new address";
+    return "Add Plan for Another Address";
   }
 
   if (isStandard) {

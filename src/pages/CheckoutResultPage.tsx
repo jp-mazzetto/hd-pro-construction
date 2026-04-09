@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { PHONE_NUMBER } from "../consts/site";
@@ -6,6 +6,7 @@ import useAuth from "../hooks/useAuth";
 import useAppHandlers from "../hooks/useAppHandlers";
 import useCheckoutSessionVerification from "../hooks/useCheckoutSessionVerification";
 import useContactActions from "../hooks/useContactActions";
+import { useCurrentActiveSubscription } from "../hooks/useCurrentActiveSubscription";
 import useScrollThreshold from "../hooks/useScrollThreshold";
 import useToggle from "../hooks/useToggle";
 import HomeView from "../components/app/HomeView";
@@ -23,8 +24,16 @@ const CheckoutResultPage = ({ status }: CheckoutResultPageProps) => {
   const scrolled = useScrollThreshold(50);
   const { value: isMenuOpen, toggle: toggleMenu, setFalse: closeMenu } = useToggle(false);
   const { session, isAuthLoading, isAuthenticated, openAuthModal } = useAuth();
-  const { handleDashboardNavigation, handlePlanRequest, navigateToHome, navigateToDashboard } =
-    useAppHandlers();
+  const { currentActiveSubscription, isLoadingSubscription } =
+    useCurrentActiveSubscription(isAuthenticated);
+  const {
+    handleDashboardNavigation,
+    handlePlanRequest,
+    navigateToHome,
+    navigateToDashboard,
+    navigateToPlans,
+    navigateToServices,
+  } = useAppHandlers();
   const { requestSmsContact, requestCallContact } = useContactActions(PHONE_NUMBER);
   const [searchParams] = useSearchParams();
   const [checkoutContext, setCheckoutContext] = useState<CheckoutSuccessContext | null>(() => {
@@ -81,19 +90,32 @@ const CheckoutResultPage = ({ status }: CheckoutResultPageProps) => {
     };
   }, [status, session, navigateToDashboard, checkoutContext]);
 
+  const handleReferralPromotionClick = useCallback(() => {
+    if (!isAuthenticated) {
+      openAuthModal();
+      return;
+    }
+
+    navigateToPlans();
+  }, [isAuthenticated, openAuthModal, navigateToPlans]);
+
   return (
     <HomeView
       scrolled={scrolled}
       isMenuOpen={isMenuOpen}
       isAuthLoading={isAuthLoading}
       isAuthenticated={isAuthenticated}
+      currentSubscription={currentActiveSubscription}
+      isLoadingSubscription={isLoadingSubscription}
       checkoutResultStatus={status}
       onMenuToggle={toggleMenu}
       onMenuClose={closeMenu}
       onAuthClick={openAuthModal}
+      onHeroPrimaryAction={navigateToServices}
       onDashboardClick={handleDashboardNavigation}
       onServiceRequest={requestSmsContact}
       onPlanRequest={handlePlanRequest}
+      onReferralPromotionClick={handleReferralPromotionClick}
       onCallRequest={requestCallContact}
       onCheckoutResultClose={navigateToHome}
       checkoutResultHasLinkedProperty={checkoutContext?.hasLinkedProperty}

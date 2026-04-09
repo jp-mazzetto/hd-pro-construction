@@ -9,20 +9,25 @@ import HeroSection from "../sections/HeroSection";
 import PlansPromotionSection from "../sections/PlansPromotionSection";
 import ServicesSection from "../sections/ServicesSection";
 import type { ServiceName, SubscriptionPlanName } from "../../consts/site";
+import type { UserSubscription } from "../../types/lib";
 
 interface HomeViewProps {
   scrolled: boolean;
   isMenuOpen: boolean;
   isAuthLoading: boolean;
   isAuthenticated: boolean;
+  currentSubscription?: UserSubscription | null;
+  isLoadingSubscription?: boolean;
   checkoutResultStatus?: "success" | "cancel";
   checkoutResultHasLinkedProperty?: boolean | null;
   onMenuToggle: () => void;
   onMenuClose: () => void;
   onAuthClick: () => void;
+  onHeroPrimaryAction: () => void;
   onDashboardClick: () => void;
   onServiceRequest: (service?: ServiceName) => void;
   onPlanRequest: (planName: SubscriptionPlanName) => void;
+  onReferralPromotionClick: () => void;
   onCallRequest: () => void;
   onCheckoutResultClose: () => void;
   onCheckoutResultScheduleSetup?: () => void;
@@ -33,14 +38,18 @@ const HomeView = ({
   isMenuOpen,
   isAuthLoading,
   isAuthenticated,
+  currentSubscription,
+  isLoadingSubscription = false,
   checkoutResultStatus,
   checkoutResultHasLinkedProperty,
   onMenuToggle,
   onMenuClose,
   onAuthClick,
+  onHeroPrimaryAction,
   onDashboardClick,
   onServiceRequest,
   onPlanRequest,
+  onReferralPromotionClick,
   onCallRequest,
   onCheckoutResultClose,
   onCheckoutResultScheduleSetup,
@@ -73,12 +82,15 @@ const HomeView = ({
         }}
       />
 
-      <HeroSection onAuthClick={onAuthClick} />
+      <HeroSection onPrimaryAction={onHeroPrimaryAction} />
       <ServicesSection onServiceRequest={onServiceRequest} />
       {!isAuthLoading && (
         <PlansPromotionSection
           onPlanRequest={onPlanRequest}
+          onReferralPromotionClick={onReferralPromotionClick}
           isAuthenticated={isAuthenticated}
+          currentSubscription={currentSubscription}
+          isLoadingSubscription={isLoadingSubscription}
           showPlans
         />
       )}

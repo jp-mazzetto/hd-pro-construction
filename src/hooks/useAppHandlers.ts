@@ -22,6 +22,10 @@ const useAppHandlers = () => {
     void navigate("/plans");
   }, [navigate]);
 
+  const navigateToServices = useCallback(() => {
+    void navigate("/services");
+  }, [navigate]);
+
   const navigateToCheckout = useCallback(
     (tier: string) => {
       void navigate(`/checkout?plan=${tier}`);
@@ -96,6 +100,7 @@ const useAppHandlers = () => {
   return {
     navigateToHome,
     navigateToPlans,
+    navigateToServices,
     navigateToCheckout,
     navigateToDashboard,
     handleDashboardNavigation,

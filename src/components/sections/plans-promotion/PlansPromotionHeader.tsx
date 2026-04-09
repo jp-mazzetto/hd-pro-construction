@@ -14,11 +14,11 @@ export const PlansPromotionHeader = ({
       Plans
     </p>
     <h2 className="mt-3 text-3xl font-black uppercase italic tracking-tight sm:text-4xl">
-      {hasSubscription ? "Manage Your Plan" : "Choose Your Lawn Plan"}
+      {hasSubscription ? "Need service for another address?" : "Choose Your Lawn Plan"}
     </h2>
     <p className="mt-3 max-w-2xl text-gray-400">
       {hasSubscription
-        ? "Your current subscription is below. Compare tiers if you want to change coverage."
+        ? "You already have an active plan. Start another plan to cover an additional property."
         : "Start with a monthly plan and activate service after secure Stripe checkout."}
     </p>
   </div>

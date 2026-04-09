@@ -5,6 +5,7 @@ import ProtectedLayout from "./layouts/ProtectedLayout";
 import AdminProtectedLayout from "./layouts/AdminProtectedLayout";
 import HomePage from "./pages/HomePage";
 import PlansPage from "./pages/PlansPage";
+import ServicesPage from "./pages/ServicesPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import CheckoutResultPage from "./pages/CheckoutResultPage";
 import ContractPage from "./pages/ContractPage";
@@ -17,6 +18,7 @@ const router = createBrowserRouter([
     children: [
       // Public routes
       { path: "/", element: <HomePage /> },
+      { path: "/services", element: <ServicesPage /> },
       { path: "/plans", element: <PlansPage /> },
       { path: "/contract", element: <ContractPage /> },
       { path: "/checkout", element: <CheckoutPage /> },

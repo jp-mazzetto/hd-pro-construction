@@ -11,6 +11,7 @@ import {
 
 interface PlansPromotionSectionProps {
   onPlanRequest: (plan: SubscriptionPlanName) => void;
+  onReferralPromotionClick: () => void;
   isAuthenticated?: boolean;
   currentSubscription?: UserSubscription | null;
   isLoadingSubscription?: boolean;
@@ -23,6 +24,7 @@ interface PlansPromotionSectionProps {
  */
 const PlansPromotionSection = ({
   onPlanRequest,
+  onReferralPromotionClick,
   isAuthenticated,
   currentSubscription,
   isLoadingSubscription = false,
@@ -69,7 +71,10 @@ const PlansPromotionSection = ({
         )}
 
         <div className={showPlans ? "mt-16 md:mt-20" : ""}>
-          <ReferralPromotionCard hasSubscription={hasSubscription} />
+          <ReferralPromotionCard
+            hasSubscription={hasSubscription}
+            onActionClick={onReferralPromotionClick}
+          />
         </div>
       </div>
     </section>

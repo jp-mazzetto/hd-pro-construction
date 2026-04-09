@@ -268,7 +268,7 @@ export const LOCAL_BUSINESS_SCHEMA = {
 };
 
 export const NAV_ITEMS: NavItem[] = [
-  { label: "Services", href: "#services" },
+  { label: "Services", href: "/services" },
   { label: "About", href: "#about" },
   { label: "Contact", href: "#contact" },
   { label: "Plans", href: "/plans" },
