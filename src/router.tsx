@@ -4,6 +4,7 @@ import { createBrowserRouter, type RouteObject } from "react-router-dom";
 import RootLayout from "./layouts/RootLayout";
 import ProtectedLayout from "./layouts/ProtectedLayout";
 import AdminProtectedLayout from "./layouts/AdminProtectedLayout";
+import PageFallback from "./components/PageFallback";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const PlansPage = lazy(() => import("./pages/PlansPage"));
@@ -15,9 +16,6 @@ const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
-const PageFallback = () => (
-  <div className="flex min-h-screen items-center justify-center bg-slate-950" />
-);
 
 const withSuspense = (element: React.ReactElement) => (
   <Suspense fallback={<PageFallback />}>{element}</Suspense>
