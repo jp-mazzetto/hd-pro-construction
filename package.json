@@ -7,7 +7,7 @@
     "dev": "vite",
     "seo:generate": "node ./scripts/seo/generate-static-seo-files.mjs",
     "prebuild": "npm run seo:generate",
-    "build": "vite build",
+    "build": "node scripts/build.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "preview": "vite preview"
