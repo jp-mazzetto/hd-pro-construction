@@ -1,5 +1,6 @@
 import { useCallback } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { useLocation, useNavigate } from "../router-adapter";
 
 import type { SubscriptionPlanName } from "../consts/site";
 import type { LoginInput } from "../types/auth";
@@ -8,10 +9,12 @@ import type { DashboardRouteParams } from "../types/app";
 import useAuth from "./useAuth";
 import { buildDashboardPath, getPlanTierByName } from "../utils/navigation";
 import { fetchTermsStatus } from "../lib/auth-client";
+import { queryKeys } from "../lib/query-keys";
 
 const useAppHandlers = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const { session, openAuthModal, closeAuthModal, login, pendingPlan, setPendingPlan } =
     useAuth();
 
@@ -37,7 +40,11 @@ const useAppHandlers = () => {
   const navigateToContractOrCheckout = useCallback(
     async (tier: string) => {
       try {
-        const { accepted } = await fetchTermsStatus();
+        const { accepted } = await queryClient.fetchQuery({
+          queryKey: queryKeys.terms.status,
+          queryFn: fetchTermsStatus,
+          staleTime: 60 * 60 * 1000,
+        });
         if (accepted) {
           void navigate(`/checkout?plan=${tier}`);
         } else {
@@ -47,7 +54,7 @@ const useAppHandlers = () => {
         void navigate(`/contract?plan=${tier}`);
       }
     },
-    [navigate],
+    [navigate, queryClient],
   );
 
   const navigateToDashboard = useCallback(

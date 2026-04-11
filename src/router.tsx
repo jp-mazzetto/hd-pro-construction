@@ -1,5 +1,10 @@
-import React, { lazy, Suspense } from "react";
-import { createBrowserRouter, type RouteObject } from "react-router-dom";
+import { lazy, Suspense, type ComponentType, type ReactNode } from "react";
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+} from "@tanstack/react-router";
 
 import RootLayout from "./layouts/RootLayout";
 import ProtectedLayout from "./layouts/ProtectedLayout";
@@ -16,51 +21,165 @@ const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
-
-const withSuspense = (element: React.ReactElement) => (
-  <Suspense fallback={<PageFallback />}>{element}</Suspense>
+const withSuspense = (node: ReactNode) => (
+  <Suspense fallback={<PageFallback />}>{node}</Suspense>
 );
 
-export const appRoutes: RouteObject[] = [
-  {
-    element: <RootLayout />,
-    children: [
-      // Public routes
-      { path: "/", element: withSuspense(<HomePage />) },
-      { path: "/services", element: withSuspense(<ServicesPage />) },
-      { path: "/plans", element: withSuspense(<PlansPage />) },
-      { path: "/contract", element: withSuspense(<ContractPage />) },
-      { path: "/checkout", element: withSuspense(<CheckoutPage />) },
-      { path: "/success", element: withSuspense(<CheckoutResultPage status="success" />) },
-      { path: "/cancel", element: withSuspense(<CheckoutResultPage status="cancel" />) },
+const lazyComponent = (Component: ComponentType) => () => withSuspense(<Component />);
 
-      // Protected routes (dashboard)
-      {
-        path: "/dashboard",
-        element: <ProtectedLayout />,
-        children: [
-          { index: true, element: withSuspense(<DashboardPage section="overview" />) },
-          { path: "subscriptions/:id", element: withSuspense(<DashboardPage section="subscription-detail" />) },
-          { path: "properties", element: withSuspense(<DashboardPage section="properties" />) },
-          { path: "billing", element: withSuspense(<DashboardPage section="billing" />) },
-          { path: "schedule", element: withSuspense(<DashboardPage section="schedule" />) },
-          { path: "schedule/setup/:id", element: withSuspense(<DashboardPage section="schedule-setup" />) },
-          { path: "settings", element: withSuspense(<DashboardPage section="settings" />) },
-        ],
-      },
+const rootRoute = createRootRoute({
+  component: RootLayout,
+  notFoundComponent: lazyComponent(NotFoundPage),
+});
 
-      // Protected routes (admin)
-      {
-        path: "/admin",
-        element: <AdminProtectedLayout />,
-        children: [
-          { index: true, element: withSuspense(<AdminPage section="visit-calendar" />) },
-        ],
-      },
-      { path: "/404", element: withSuspense(<NotFoundPage />) },
-      { path: "*", element: withSuspense(<NotFoundPage />) },
-    ],
-  },
-];
+const homeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/",
+  component: lazyComponent(HomePage),
+});
 
-export const createAppBrowserRouter = () => createBrowserRouter(appRoutes);
+const servicesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/services",
+  component: lazyComponent(ServicesPage),
+});
+
+const plansRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/plans",
+  component: lazyComponent(PlansPage),
+});
+
+const contractRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/contract",
+  component: lazyComponent(ContractPage),
+});
+
+const checkoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/checkout",
+  component: lazyComponent(CheckoutPage),
+});
+
+const checkoutSuccessRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/success",
+  component: () => withSuspense(<CheckoutResultPage status="success" />),
+});
+
+const checkoutCancelRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/cancel",
+  component: () => withSuspense(<CheckoutResultPage status="cancel" />),
+});
+
+const dashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/dashboard",
+  component: ProtectedLayout,
+});
+
+const dashboardIndexRoute = createRoute({
+  getParentRoute: () => dashboardRoute,
+  path: "/",
+  component: () => withSuspense(<DashboardPage section="overview" />),
+});
+
+const dashboardSubscriptionDetailRoute = createRoute({
+  getParentRoute: () => dashboardRoute,
+  path: "subscriptions/$id",
+  component: () => withSuspense(<DashboardPage section="subscription-detail" />),
+});
+
+const dashboardPropertiesRoute = createRoute({
+  getParentRoute: () => dashboardRoute,
+  path: "properties",
+  component: () => withSuspense(<DashboardPage section="properties" />),
+});
+
+const dashboardBillingRoute = createRoute({
+  getParentRoute: () => dashboardRoute,
+  path: "billing",
+  component: () => withSuspense(<DashboardPage section="billing" />),
+});
+
+const dashboardScheduleRoute = createRoute({
+  getParentRoute: () => dashboardRoute,
+  path: "schedule",
+  component: () => withSuspense(<DashboardPage section="schedule" />),
+});
+
+const dashboardScheduleSetupRoute = createRoute({
+  getParentRoute: () => dashboardRoute,
+  path: "schedule/setup/$id",
+  component: () => withSuspense(<DashboardPage section="schedule-setup" />),
+});
+
+const dashboardSettingsRoute = createRoute({
+  getParentRoute: () => dashboardRoute,
+  path: "settings",
+  component: () => withSuspense(<DashboardPage section="settings" />),
+});
+
+const adminRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin",
+  component: AdminProtectedLayout,
+});
+
+const adminIndexRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: "/",
+  component: () => withSuspense(<AdminPage section="visit-calendar" />),
+});
+
+const notFoundRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/404",
+  component: lazyComponent(NotFoundPage),
+});
+
+const routeTree = rootRoute.addChildren([
+  homeRoute,
+  servicesRoute,
+  plansRoute,
+  contractRoute,
+  checkoutRoute,
+  checkoutSuccessRoute,
+  checkoutCancelRoute,
+  dashboardRoute.addChildren([
+    dashboardIndexRoute,
+    dashboardSubscriptionDetailRoute,
+    dashboardPropertiesRoute,
+    dashboardBillingRoute,
+    dashboardScheduleRoute,
+    dashboardScheduleSetupRoute,
+    dashboardSettingsRoute,
+  ]),
+  adminRoute.addChildren([adminIndexRoute]),
+  notFoundRoute,
+]);
+
+export const createAppBrowserRouter = () =>
+  createRouter({
+    routeTree,
+    defaultPreload: "intent",
+  });
+
+export const createAppMemoryRouter = (pathname: string) =>
+  createRouter({
+    routeTree,
+    history: createMemoryHistory({
+      initialEntries: [pathname],
+    }),
+    isServer: true,
+    origin: "https://hdproconstruction.com",
+    defaultPreload: "intent",
+  });
+
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: ReturnType<typeof createAppBrowserRouter>;
+  }
+}

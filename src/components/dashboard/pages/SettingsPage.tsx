@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Eye, EyeOff, KeyRound, Mail, Shield, User } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type { AuthSession } from "../../../types/auth";
 import type { AuthIdentityView } from "../../../types/dashboard";
@@ -8,6 +9,8 @@ import {
   fetchAuthIdentities,
   changePassword,
 } from "../../../lib/dashboard-client";
+import { invalidateAuthAndPrivateQueries } from "../../../lib/query-invalidations";
+import { queryKeys } from "../../../lib/query-keys";
 
 interface SettingsPageProps {
   session: AuthSession;
@@ -15,35 +18,43 @@ interface SettingsPageProps {
 }
 
 export default function SettingsPage({ session, onSessionUpdate }: SettingsPageProps) {
+  const queryClient = useQueryClient();
   // Profile
   const [name, setName] = useState(session.actor.name);
-  const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
-  const [identities, setIdentities] = useState<AuthIdentityView[]>([]);
 
   // Password
-  const [accountHasPassword, setAccountHasPassword] = useState(
-    session.actor.hasPassword,
-  );
+  const [hasSetPassword, setHasSetPassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwordSuccessMessage, setPasswordSuccessMessage] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
 
-  useEffect(() => {
-    fetchAuthIdentities()
-      .then((data) => setIdentities(data.identities))
-      .catch(() => {});
-  }, []);
+  const identitiesQuery = useQuery({
+    queryKey: [...queryKeys.auth.session, "identities"] as const,
+    queryFn: fetchAuthIdentities,
+    staleTime: 2 * 60 * 1000,
+  });
 
-  useEffect(() => {
-    setAccountHasPassword(session.actor.hasPassword);
-  }, [session.actor.hasPassword]);
+  const updateProfileMutation = useMutation({
+    mutationFn: updateProfile,
+    onSuccess: async () => {
+      await invalidateAuthAndPrivateQueries(queryClient);
+    },
+  });
+
+  const changePasswordMutation = useMutation({
+    mutationFn: changePassword,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.auth.session });
+    },
+  });
+
+  const accountHasPassword = session.actor.hasPassword || hasSetPassword;
 
   const handleSaveProfile = useCallback(
     async (e: React.FormEvent) => {
@@ -54,22 +65,19 @@ export default function SettingsPage({ session, onSessionUpdate }: SettingsPageP
         return;
       }
 
-      setIsSaving(true);
       setProfileError(null);
       setSaveSuccess(false);
 
       try {
-        await updateProfile({ name: trimmed });
+        await updateProfileMutation.mutateAsync({ name: trimmed });
         onSessionUpdate(trimmed);
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 3000);
       } catch {
         setProfileError("Failed to update profile.");
-      } finally {
-        setIsSaving(false);
       }
     },
-    [name, onSessionUpdate],
+    [name, onSessionUpdate, updateProfileMutation],
   );
 
   const handleChangePassword = useCallback(
@@ -93,10 +101,8 @@ export default function SettingsPage({ session, onSessionUpdate }: SettingsPageP
         return;
       }
 
-      setIsChangingPassword(true);
-
       try {
-        const result = await changePassword({
+        const result = await changePasswordMutation.mutateAsync({
           currentPassword: accountHasPassword ? currentPassword : undefined,
           newPassword,
         });
@@ -105,7 +111,7 @@ export default function SettingsPage({ session, onSessionUpdate }: SettingsPageP
             ? "Password set successfully."
             : "Password changed successfully.",
         );
-        setAccountHasPassword(true);
+        setHasSetPassword(true);
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
@@ -114,16 +120,27 @@ export default function SettingsPage({ session, onSessionUpdate }: SettingsPageP
         const message =
           err instanceof Error ? err.message : "Failed to update password.";
         setPasswordError(message);
-      } finally {
-        setIsChangingPassword(false);
       }
     },
-    [accountHasPassword, currentPassword, newPassword, confirmPassword],
+    [
+      accountHasPassword,
+      changePasswordMutation,
+      confirmPassword,
+      currentPassword,
+      newPassword,
+    ],
   );
+
+  const identities: AuthIdentityView[] = useMemo(
+    () => identitiesQuery.data?.identities ?? [],
+    [identitiesQuery.data?.identities],
+  );
+  const isSaving = updateProfileMutation.isPending;
+  const isChangingPassword = changePasswordMutation.isPending;
 
   return (
     <div className="w-full max-w-5xl space-y-6">
-      <div className="grid gap-6 [grid-template-columns:repeat(auto-fit,minmax(320px,1fr))]">
+      <div className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(320px,1fr))]">
         {/* Profile */}
         <form
           onSubmit={handleSaveProfile}

@@ -36,7 +36,7 @@ const InstagramCarousel = ({
             <a href={post.link} target="_blank" rel="noopener noreferrer">
               <img src={post.url} alt={post.caption} className="w-full h-full object-cover" />
             </a>
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-center">
+            <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-6 text-center">
               <p className="text-sm font-bold italic text-white/90 uppercase tracking-tight flex items-center justify-center gap-2">
                 <Instagram size={16} className="text-orange-500" />
                 {post.caption}

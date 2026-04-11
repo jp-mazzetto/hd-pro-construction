@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "../router-adapter";
 
 import { PHONE_NUMBER } from "../consts/site";
 import useAuth from "../hooks/useAuth";

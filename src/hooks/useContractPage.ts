@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate, useSearchParams } from "../router-adapter";
 
 import { acceptTerms, fetchPlans, fetchTermsStatus } from "../lib/auth-client";
+import { queryKeys } from "../lib/query-keys";
 import type { AuthSession } from "../types/auth";
 import type { SubscriptionPlan } from "../types/lib";
 import useAuth from "./useAuth";
@@ -31,18 +33,13 @@ export interface ContractPageState {
 export default function useContractPage(): ContractPageState {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { session, isAuthLoading } = useAuth();
 
   const planTier = searchParams.get("plan");
 
-  const [plan, setPlan] = useState<SubscriptionPlan | null>(null);
-  const [isLoadingPlan, setIsLoadingPlan] = useState(true);
-  const [planNotFound, setPlanNotFound] = useState(false);
-  const [alreadyAccepted, setAlreadyAccepted] = useState(false);
-
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -51,39 +48,33 @@ export default function useContractPage(): ContractPageState {
   const endDate = useMemo(() => addMonths(startDate, 12), [startDate]);
   const billingDay = startDate.getDate();
 
-  useEffect(() => {
-    if (!session || !planTier) return;
+  const plansQuery = useQuery({
+    queryKey: queryKeys.plans.all,
+    queryFn: fetchPlans,
+    staleTime: 60 * 60 * 1000,
+    enabled: Boolean(session && planTier),
+  });
 
-    const load = async () => {
-      try {
-        const [plans, status] = await Promise.all([fetchPlans(), fetchTermsStatus()]);
-
-        if (status.accepted) {
-          setAlreadyAccepted(true);
-          return;
-        }
-
-        const found = plans.find((p) => p.tier === planTier.toUpperCase());
-        if (!found) {
-          setPlanNotFound(true);
-        } else {
-          setPlan(found);
-        }
-      } catch {
-        setPlanNotFound(true);
-      } finally {
-        setIsLoadingPlan(false);
-      }
-    };
-
-    void load();
-  }, [session, planTier]);
+  const termsStatusQuery = useQuery({
+    queryKey: queryKeys.terms.status,
+    queryFn: fetchTermsStatus,
+    staleTime: 60 * 60 * 1000,
+    enabled: Boolean(session && planTier),
+  });
 
   useEffect(() => {
-    if (alreadyAccepted && planTier) {
+    if (termsStatusQuery.data?.accepted && planTier) {
       void navigate(`/checkout?plan=${planTier}`, { replace: true });
     }
-  }, [alreadyAccepted, planTier, navigate]);
+  }, [termsStatusQuery.data?.accepted, planTier, navigate]);
+
+  const acceptTermsMutation = useMutation({
+    mutationFn: acceptTerms,
+    onSuccess: async (termsStatus) => {
+      queryClient.setQueryData(queryKeys.terms.status, termsStatus);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.terms.status });
+    },
+  });
 
   const handleScroll = () => {
     const el = scrollRef.current;
@@ -93,17 +84,32 @@ export default function useContractPage(): ContractPageState {
   };
 
   const handleAccept = async () => {
-    if (!isChecked || isSubmitting) return;
-    setIsSubmitting(true);
+    if (!isChecked || acceptTermsMutation.isPending) return;
     setSubmitError(null);
+
     try {
-      await acceptTerms();
+      await acceptTermsMutation.mutateAsync();
       void navigate(`/checkout?plan=${planTier}`, { replace: true });
     } catch {
       setSubmitError("Failed to record your acceptance. Please try again.");
-      setIsSubmitting(false);
     }
   };
+
+  const plan: SubscriptionPlan | null = useMemo(() => {
+    if (!planTier || !plansQuery.data) {
+      return null;
+    }
+
+    return plansQuery.data.find((p) => p.tier === planTier.toUpperCase()) ?? null;
+  }, [planTier, plansQuery.data]);
+
+  const isLoadingPlan =
+    Boolean(session && planTier) && (plansQuery.isPending || termsStatusQuery.isPending);
+
+  const planNotFound =
+    Boolean(session && planTier) &&
+    !isLoadingPlan &&
+    Boolean(plansQuery.isError || termsStatusQuery.isError || !plan);
 
   return {
     plan,
@@ -111,7 +117,7 @@ export default function useContractPage(): ContractPageState {
     planNotFound,
     hasScrolledToBottom,
     isChecked,
-    isSubmitting,
+    isSubmitting: acceptTermsMutation.isPending,
     submitError,
     planTier,
     startDate,

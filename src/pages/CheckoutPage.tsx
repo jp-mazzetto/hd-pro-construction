@@ -1,4 +1,4 @@
-import { Navigate, useSearchParams } from "react-router-dom";
+import { Navigate, useSearchParams } from "../router-adapter";
 
 import useAppHandlers from "../hooks/useAppHandlers";
 import CheckoutView from "../components/app/CheckoutView";

@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   CalendarDays,
   Check,
@@ -27,6 +28,12 @@ import {
   generateReferralCode,
   resumeCheckout,
 } from "../../../lib/dashboard-client";
+import {
+  invalidateCheckoutQueries,
+  invalidatePropertyAndSubscriptionQueries,
+  invalidateReferralQueries,
+} from "../../../lib/query-invalidations";
+import { queryKeys } from "../../../lib/query-keys";
 import usePropertyForm from "../../../hooks/usePropertyForm";
 import StatCard from "../shared/StatCard";
 import StatusBadge from "../shared/StatusBadge";
@@ -41,16 +48,10 @@ export default function OverviewPage({
   onNavigate,
   onNavigateToPlans,
 }: OverviewPageProps) {
-  const [subscriptions, setSubscriptions] = useState<UserSubscription[]>([]);
-  const [visits, setVisits] = useState<ServiceVisit[]>([]);
-  const [referral, setReferral] = useState<ReferralStatus | null>(null);
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   // Property form
   const [showPropertyForm, setShowPropertyForm] = useState(false);
-  const [isSubmittingProperty, setIsSubmittingProperty] = useState(false);
   const [propertyError, setPropertyError] = useState<string | null>(null);
   const [deletingPropertyId, setDeletingPropertyId] = useState<string | null>(null);
   const {
@@ -66,51 +67,71 @@ export default function OverviewPage({
 
   // Referral
   const [copied, setCopied] = useState(false);
-  const [isGeneratingCode, setIsGeneratingCode] = useState(false);
 
-  const loadData = useCallback(async () => {
-    try {
-      const [subsResult, visitsResult, referralResult, propertiesResult] =
-        await Promise.allSettled([
-          fetchSubscriptions(),
-          fetchVisits({ status: "SCHEDULED" }),
-          fetchReferralStatus(),
-          fetchProperties(),
-        ]);
+  const subscriptionsQuery = useQuery({
+    queryKey: queryKeys.subscriptions.all,
+    queryFn: fetchSubscriptions,
+    staleTime: 60 * 1000,
+  });
 
-      setSubscriptions(subsResult.status === "fulfilled" ? subsResult.value : []);
-      setVisits(visitsResult.status === "fulfilled" ? visitsResult.value : []);
-      setReferral(referralResult.status === "fulfilled" ? referralResult.value : null);
-      setProperties(
-        propertiesResult.status === "fulfilled" ? propertiesResult.value : [],
+  const visitsQuery = useQuery({
+    queryKey: queryKeys.visits.list({ status: "SCHEDULED" }),
+    queryFn: () => fetchVisits({ status: "SCHEDULED" }),
+    staleTime: 60 * 1000,
+  });
+
+  const referralQuery = useQuery({
+    queryKey: queryKeys.referral.status,
+    queryFn: fetchReferralStatus,
+    staleTime: 60 * 1000,
+  });
+
+  const propertiesQuery = useQuery({
+    queryKey: queryKeys.properties.all,
+    queryFn: fetchProperties,
+    staleTime: 60 * 1000,
+  });
+
+  const createPropertyMutation = useMutation({
+    mutationFn: createProperty,
+    onSuccess: async () => {
+      await invalidatePropertyAndSubscriptionQueries(queryClient);
+    },
+  });
+
+  const deletePropertyMutation = useMutation({
+    mutationFn: deleteProperty,
+    onSuccess: async () => {
+      await invalidatePropertyAndSubscriptionQueries(queryClient);
+    },
+  });
+
+  const resumeCheckoutMutation = useMutation({
+    mutationFn: resumeCheckout,
+    onSuccess: async (result) => {
+      if (result.status === "activated") {
+        await invalidateCheckoutQueries(queryClient);
+      }
+    },
+  });
+
+  const generateReferralCodeMutation = useMutation({
+    mutationFn: generateReferralCode,
+    onSuccess: async ({ referralCode }) => {
+      queryClient.setQueryData<ReferralStatus | null>(queryKeys.referral.status, (current) =>
+        current ? { ...current, referralCode } : current,
       );
-
-      const hasLoadFailures = [subsResult, visitsResult, referralResult, propertiesResult]
-        .some((result) => result.status === "rejected");
-      setLoadError(
-        hasLoadFailures
-          ? "Some dashboard data could not be loaded. Please refresh and try again."
-          : null,
-      );
-    } catch {
-      setLoadError("Failed to load dashboard data. Please refresh and try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void loadData();
-  }, [loadData]);
+      await invalidateReferralQueries(queryClient);
+    },
+  });
 
   // Property handlers
   const handleSubmitProperty = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      setIsSubmittingProperty(true);
       setPropertyError(null);
       try {
-        await createProperty({
+        await createPropertyMutation.mutateAsync({
           street: propertyForm.street.trim(),
           city: propertyForm.city.trim(),
           state: propertyForm.state.trim().toUpperCase(),
@@ -120,38 +141,30 @@ export default function OverviewPage({
         });
         resetPropertyForm();
         setShowPropertyForm(false);
-        const props = await fetchProperties().catch(() => []);
-        setProperties(props);
       } catch {
         setPropertyError("Failed to create property.");
-      } finally {
-        setIsSubmittingProperty(false);
       }
     },
-    [propertyForm, resetPropertyForm],
+    [createPropertyMutation, propertyForm, resetPropertyForm],
   );
 
   const handleDeleteProperty = useCallback(async (id: string) => {
     setDeletingPropertyId(id);
     try {
-      await deleteProperty(id);
-      setProperties((prev) => prev.filter((p) => p.id !== id));
+      await deletePropertyMutation.mutateAsync(id);
     } catch {
       setPropertyError("Failed to delete. This address may be linked to a plan.");
     } finally {
       setDeletingPropertyId(null);
     }
-  }, []);
+  }, [deletePropertyMutation]);
 
   const handleResumeCheckout = useCallback(async (e: React.MouseEvent, subId: string) => {
     e.stopPropagation();
     setResumingSubId(subId);
     try {
-      const result = await resumeCheckout(subId);
-      if (result.status === "activated") {
-        const subs = await fetchSubscriptions().catch(() => []);
-        setSubscriptions(subs);
-      } else if (result.status === "checkout_url" && result.checkoutUrl) {
+      const result = await resumeCheckoutMutation.mutateAsync(subId);
+      if (result.status === "checkout_url" && result.checkoutUrl) {
         window.location.href = result.checkoutUrl;
       }
     } catch {
@@ -159,27 +172,52 @@ export default function OverviewPage({
     } finally {
       setResumingSubId(null);
     }
-  }, []);
+  }, [resumeCheckoutMutation]);
 
   // Referral handlers
   const handleCopyCode = useCallback(async () => {
-    if (!referral?.referralCode) return;
-    await navigator.clipboard.writeText(referral.referralCode);
+    if (!referralQuery.data?.referralCode) return;
+    await navigator.clipboard.writeText(referralQuery.data.referralCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [referral]);
+  }, [referralQuery.data?.referralCode]);
 
   const handleGenerateCode = useCallback(async () => {
-    setIsGeneratingCode(true);
     try {
-      const { referralCode } = await generateReferralCode();
-      setReferral((prev) => prev ? { ...prev, referralCode } : null);
+      await generateReferralCodeMutation.mutateAsync();
     } catch {
       // Ignore generation errors silently
-    } finally {
-      setIsGeneratingCode(false);
     }
-  }, []);
+  }, [generateReferralCodeMutation]);
+
+  const subscriptions: UserSubscription[] = subscriptionsQuery.data ?? [];
+  const visits: ServiceVisit[] = visitsQuery.data ?? [];
+  const referral: ReferralStatus | null = referralQuery.data ?? null;
+  const properties: Property[] = propertiesQuery.data ?? [];
+
+  const hasLoadFailures = useMemo(
+    () =>
+      subscriptionsQuery.isError ||
+      visitsQuery.isError ||
+      referralQuery.isError ||
+      propertiesQuery.isError,
+    [
+      subscriptionsQuery.isError,
+      visitsQuery.isError,
+      referralQuery.isError,
+      propertiesQuery.isError,
+    ],
+  );
+
+  const loadError = hasLoadFailures
+    ? "Some dashboard data could not be loaded. Please refresh and try again."
+    : null;
+
+  const isLoading =
+    subscriptionsQuery.isPending ||
+    visitsQuery.isPending ||
+    referralQuery.isPending ||
+    propertiesQuery.isPending;
 
   if (isLoading) {
     return (
@@ -404,10 +442,10 @@ export default function OverviewPage({
                 />
                 <button
                   type="submit"
-                  disabled={isSubmittingProperty}
+                  disabled={createPropertyMutation.isPending}
                   className="rounded-xl bg-orange-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-700 disabled:opacity-50 cursor-pointer"
                 >
-                  {isSubmittingProperty ? "Saving..." : "Save Property"}
+                  {createPropertyMutation.isPending ? "Saving..." : "Save Property"}
                 </button>
               </form>
             )}
@@ -585,11 +623,11 @@ export default function OverviewPage({
               <button
                 type="button"
                 onClick={handleGenerateCode}
-                disabled={isGeneratingCode}
+                disabled={generateReferralCodeMutation.isPending}
                 className="mb-4 flex items-center gap-2 rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-orange-700 disabled:opacity-50 cursor-pointer"
               >
                 <Share2 size={14} />
-                {isGeneratingCode ? "Generating..." : "Generate Code"}
+                {generateReferralCodeMutation.isPending ? "Generating..." : "Generate Code"}
               </button>
             )}
 

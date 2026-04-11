@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate } from "../router-adapter";
 import { ArrowLeft, Loader2, ScrollText } from "lucide-react";
 
 import useContractPage from "../hooks/useContractPage";

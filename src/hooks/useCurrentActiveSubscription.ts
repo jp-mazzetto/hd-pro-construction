@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { fetchUserSubscriptions } from "../lib/auth-client";
+import { queryKeys } from "../lib/query-keys";
 import type { UserSubscription } from "../types/lib";
 
 interface UseCurrentActiveSubscriptionReturn {
@@ -14,52 +16,25 @@ const isCurrentlyActiveSubscription = (subscription: UserSubscription) =>
 export const useCurrentActiveSubscription = (
   isAuthenticated: boolean,
 ): UseCurrentActiveSubscriptionReturn => {
-  const [currentActiveSubscription, setCurrentActiveSubscription] =
-    useState<UserSubscription | null>(null);
-  const [isLoadingSubscription, setIsLoadingSubscription] = useState(false);
+  const subscriptionsQuery = useQuery({
+    queryKey: queryKeys.subscriptions.all,
+    queryFn: fetchUserSubscriptions,
+    staleTime: 60 * 1000,
+    enabled: isAuthenticated,
+  });
 
-  useEffect(() => {
-    let cancelled = false;
-
-    if (!isAuthenticated) {
-      setCurrentActiveSubscription(null);
-      setIsLoadingSubscription(false);
-      return () => {
-        cancelled = true;
-      };
+  const currentActiveSubscription = useMemo(() => {
+    if (!isAuthenticated || !subscriptionsQuery.data) {
+      return null;
     }
 
-    const loadCurrentSubscription = async () => {
-      setIsLoadingSubscription(true);
-
-      try {
-        const subscriptions = await fetchUserSubscriptions();
-        if (cancelled) return;
-
-        const activeSubscription =
-          subscriptions.find(isCurrentlyActiveSubscription) ?? null;
-
-        setCurrentActiveSubscription(activeSubscription);
-      } catch {
-        if (!cancelled) {
-          setCurrentActiveSubscription(null);
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoadingSubscription(false);
-        }
-      }
-    };
-
-    void loadCurrentSubscription();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isAuthenticated]);
+    return (
+      subscriptionsQuery.data.find(isCurrentlyActiveSubscription) ?? null
+    );
+  }, [isAuthenticated, subscriptionsQuery.data]);
 
   return {
     currentActiveSubscription,
-    isLoadingSubscription,
+    isLoadingSubscription: isAuthenticated && subscriptionsQuery.isPending,
   };
 };

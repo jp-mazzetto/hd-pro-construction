@@ -1,65 +1,65 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { Check, Copy, Gift, Share2 } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type { ReferralStatus } from "../../../types/dashboard";
 import {
   fetchReferralStatus,
   generateReferralCode,
 } from "../../../lib/dashboard-client";
+import { invalidateReferralQueries } from "../../../lib/query-invalidations";
+import { queryKeys } from "../../../lib/query-keys";
 import EmptyState from "../shared/EmptyState";
 
 export default function ReferralsPage() {
-  const [status, setStatus] = useState<ReferralStatus | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
+  const referralStatusQuery = useQuery({
+    queryKey: queryKeys.referral.status,
+    queryFn: fetchReferralStatus,
+    staleTime: 60 * 1000,
+  });
 
-    const load = async () => {
-      try {
-        const data = await fetchReferralStatus();
-        if (!cancelled) setStatus(data);
-      } catch {
-        if (!cancelled) setError("Failed to load referral status.");
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    };
-
-    void load();
-    return () => { cancelled = true; };
-  }, []);
-
-  const handleGenerate = useCallback(async () => {
-    setIsGenerating(true);
-    try {
-      const { referralCode } = await generateReferralCode();
-      setStatus((prev) =>
-        prev ? { ...prev, referralCode } : null,
+  const generateCodeMutation = useMutation({
+    mutationFn: generateReferralCode,
+    onSuccess: async ({ referralCode }) => {
+      queryClient.setQueryData<ReferralStatus | null>(queryKeys.referral.status, (prev) =>
+        prev ? { ...prev, referralCode } : prev,
       );
+      await invalidateReferralQueries(queryClient);
+    },
+  });
+
+  const handleGenerate = async () => {
+    setError(null);
+    try {
+      await generateCodeMutation.mutateAsync();
     } catch {
       setError("Failed to generate referral code.");
-    } finally {
-      setIsGenerating(false);
     }
-  }, []);
+  };
 
-  const handleCopy = useCallback(async () => {
-    if (!status?.referralCode) return;
-    await navigator.clipboard.writeText(status.referralCode);
+  const handleCopy = async () => {
+    if (!referralStatusQuery.data?.referralCode) return;
+    await navigator.clipboard.writeText(referralStatusQuery.data.referralCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [status]);
+  };
+
+  const status = referralStatusQuery.data ?? null;
+  const isLoading = referralStatusQuery.isPending;
+  const resolvedError =
+    error ??
+    (referralStatusQuery.isError ? "Failed to load referral status." : null);
 
   if (isLoading) {
     return <div className="h-64 animate-pulse rounded-xl bg-slate-900" />;
   }
 
-  if (error) {
-    return <p className="text-sm text-red-400">{error}</p>;
+  if (resolvedError) {
+    return <p className="text-sm text-red-400">{resolvedError}</p>;
   }
 
   if (!status) {
@@ -77,7 +77,7 @@ export default function ReferralsPage() {
   return (
     <div className="space-y-6">
       {/* Hero card */}
-      <div className="rounded-xl border border-orange-500/20 bg-gradient-to-br from-orange-500/10 to-slate-900 p-6">
+      <div className="rounded-xl border border-orange-500/20 bg-linear-to-br from-orange-500/10 to-slate-900 p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/15 text-orange-400">
             <Gift size={24} />
@@ -131,11 +131,11 @@ export default function ReferralsPage() {
           <button
             type="button"
             onClick={handleGenerate}
-            disabled={isGenerating}
+            disabled={generateCodeMutation.isPending}
             className="flex items-center gap-2 rounded-lg bg-orange-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-700 disabled:opacity-50 cursor-pointer"
           >
             <Share2 size={16} />
-            {isGenerating ? "Generating..." : "Generate Code"}
+            {generateCodeMutation.isPending ? "Generating..." : "Generate Code"}
           </button>
         )}
       </div>

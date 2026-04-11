@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { MapPin, Navigation, Plus, Trash2, X } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type { Property } from "../../../types/lib";
 import {
@@ -7,6 +8,8 @@ import {
   createProperty,
   deleteProperty,
 } from "../../../lib/dashboard-client";
+import { invalidatePropertyAndSubscriptionQueries } from "../../../lib/query-invalidations";
+import { queryKeys } from "../../../lib/query-keys";
 import usePropertyForm from "../../../hooks/usePropertyForm";
 import EmptyState from "../shared/EmptyState";
 import PropertyFormFields from "../../properties/PropertyFormFields";
@@ -107,12 +110,10 @@ function PropertyMapPanel({ prop }: { prop: Property }) {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function PropertiesPage() {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const {
     form,
     resetForm,
@@ -121,29 +122,33 @@ export default function PropertiesPage() {
     onZipCodeBlur,
   } = usePropertyForm();
 
-  const loadProperties = useCallback(async () => {
-    try {
-      const data = await fetchProperties();
-      setProperties(data);
-    } catch {
-      setError("Failed to load properties.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const propertiesQuery = useQuery({
+    queryKey: queryKeys.properties.all,
+    queryFn: fetchProperties,
+    staleTime: 60 * 1000,
+  });
 
-  useEffect(() => {
-    void loadProperties();
-  }, [loadProperties]);
+  const createPropertyMutation = useMutation({
+    mutationFn: createProperty,
+    onSuccess: async () => {
+      await invalidatePropertyAndSubscriptionQueries(queryClient);
+    },
+  });
+
+  const deletePropertyMutation = useMutation({
+    mutationFn: deleteProperty,
+    onSuccess: async () => {
+      await invalidatePropertyAndSubscriptionQueries(queryClient);
+    },
+  });
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      setIsSubmitting(true);
-      setError(null);
+      setActionError(null);
 
       try {
-        await createProperty({
+        await createPropertyMutation.mutateAsync({
           street: form.street.trim(),
           city: form.city.trim(),
           state: form.state.trim().toUpperCase(),
@@ -153,30 +158,35 @@ export default function PropertiesPage() {
         });
         resetForm();
         setShowForm(false);
-        await loadProperties();
       } catch {
-        setError("Failed to create property.");
-      } finally {
-        setIsSubmitting(false);
+        setActionError("Failed to create property.");
       }
     },
-    [form, loadProperties, resetForm],
+    [createPropertyMutation, form, resetForm],
   );
 
   const handleDelete = useCallback(
     async (id: string) => {
       setDeletingId(id);
       try {
-        await deleteProperty(id);
-        setProperties((prev) => prev.filter((p) => p.id !== id));
+        await deletePropertyMutation.mutateAsync(id);
       } catch {
-        setError("Failed to delete property. It may be linked to a plan.");
+        setActionError("Failed to delete property. It may be linked to a plan.");
       } finally {
         setDeletingId(null);
       }
     },
-    [],
+    [deletePropertyMutation],
   );
+
+  const properties: Property[] = useMemo(
+    () => propertiesQuery.data ?? [],
+    [propertiesQuery.data],
+  );
+  const isLoading = propertiesQuery.isPending;
+  const error =
+    actionError ??
+    (propertiesQuery.isError ? "Failed to load properties." : null);
 
   // ── Loading skeleton ──────────────────────────────────────────────────────
   if (isLoading) {
@@ -241,10 +251,10 @@ export default function PropertiesPage() {
           />
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={createPropertyMutation.isPending}
             className="rounded-lg bg-orange-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-700 disabled:opacity-50 cursor-pointer"
           >
-            {isSubmitting ? "Saving..." : "Save Property"}
+            {createPropertyMutation.isPending ? "Saving..." : "Save Property"}
           </button>
         </form>
       )}

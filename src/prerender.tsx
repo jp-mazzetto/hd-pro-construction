@@ -1,9 +1,11 @@
 import { renderToString } from "react-dom/server";
 import { HelmetProvider } from "react-helmet-async";
-import { createMemoryRouter, RouterProvider } from "react-router-dom";
+import { RouterProvider } from "@tanstack/react-router";
+import { QueryClientProvider } from "@tanstack/react-query";
 
 import { buildPrerenderHead, getSeoConfig, getStaticPrerenderRoutes } from "./consts/seo";
-import { appRoutes } from "./router";
+import { createAppMemoryRouter } from "./router";
+import { createAppQueryClient } from "./lib/query-client";
 
 interface PrerenderContext {
   url: string;
@@ -11,16 +13,19 @@ interface PrerenderContext {
 
 export async function prerender(context: PrerenderContext) {
   const pathname = new URL(context.url, "https://hdproconstruction.com").pathname;
-  const router = createMemoryRouter(appRoutes, {
-    initialEntries: [pathname],
-  });
+  const router = createAppMemoryRouter(pathname);
+  const queryClient = createAppQueryClient();
 
   let html = "";
   (globalThis as { __HD_PRERENDER__?: boolean }).__HD_PRERENDER__ = true;
   try {
+    await router.load();
+
     html = renderToString(
       <HelmetProvider>
-        <RouterProvider router={router} />
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
       </HelmetProvider>,
     );
   } finally {

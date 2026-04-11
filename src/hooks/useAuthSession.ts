@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   ApiError,
@@ -8,6 +9,8 @@ import {
   registerWithEmail,
   logoutCurrentSession,
 } from "../lib/auth-client";
+import { invalidateAuthAndPrivateQueries } from "../lib/query-invalidations";
+import { queryKeys } from "../lib/query-keys";
 import type { AuthSession, LoginInput, RegisterInput } from "../types/auth";
 
 const SESSION_LOAD_ERROR =
@@ -52,97 +55,90 @@ const getAuthErrorMessage = (caughtError: unknown, fallbackMessage: string) => {
 };
 
 export default function useAuthSession() {
-  const [session, setSession] = useState<AuthSession | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const restoreSession = async () => {
+  const sessionQuery = useQuery({
+    queryKey: queryKeys.auth.session,
+    queryFn: async () => {
       try {
-        const nextSession = await restoreSessionOnce();
-
-        if (!isMounted) {
-          return;
-        }
-
-        setSession(nextSession);
-        setError(null);
+        return await restoreSessionOnce();
       } catch (caughtError) {
-        if (!isMounted) {
-          return;
-        }
-
         if (caughtError instanceof ApiError && caughtError.status === 401) {
-          setSession(null);
-          setError(null);
-          return;
+          return null;
         }
 
-        setError(SESSION_LOAD_ERROR);
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        throw caughtError;
       }
-    };
+    },
+    staleTime: 2 * 60 * 1000,
+    retry: (failureCount, caughtError) => {
+      if (caughtError instanceof ApiError && caughtError.status === 401) {
+        return false;
+      }
 
-    void restoreSession();
+      return failureCount < 1;
+    },
+  });
 
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const loginMutation = useMutation({
+    mutationFn: loginWithEmail,
+    onSuccess: async (nextSession) => {
+      queryClient.setQueryData<AuthSession | null>(queryKeys.auth.session, nextSession);
+      await invalidateAuthAndPrivateQueries(queryClient);
+    },
+  });
+
+  const registerMutation = useMutation({
+    mutationFn: registerWithEmail,
+    onSuccess: async (response) => {
+      queryClient.setQueryData<AuthSession | null>(queryKeys.auth.session, null);
+      setNotice(response.message);
+      await invalidateAuthAndPrivateQueries(queryClient);
+    },
+  });
+
+  const logoutMutation = useMutation({
+    mutationFn: logoutCurrentSession,
+    onSuccess: async () => {
+      queryClient.setQueryData<AuthSession | null>(queryKeys.auth.session, null);
+      setError(null);
+      setNotice(null);
+      await invalidateAuthAndPrivateQueries(queryClient);
+    },
+  });
 
   const login = async (input: LoginInput) => {
-    setIsSubmitting(true);
     setError(null);
     setNotice(null);
 
     try {
-      const nextSession = await loginWithEmail(input);
-      setSession(nextSession);
+      await loginMutation.mutateAsync(input);
       return true;
     } catch (caughtError) {
       setError(getAuthErrorMessage(caughtError, LOGIN_ERROR));
       return false;
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   const register = async (input: RegisterInput) => {
-    setIsSubmitting(true);
     setError(null);
 
     try {
-      const response = await registerWithEmail(input);
-      setSession(null);
-      setNotice(response.message);
+      await registerMutation.mutateAsync(input);
       return true;
     } catch (caughtError) {
       setError(getAuthErrorMessage(caughtError, REGISTER_ERROR));
       return false;
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   const logout = async () => {
-    setIsSubmitting(true);
-
     try {
-      await logoutCurrentSession();
-      setSession(null);
-      setError(null);
-      setNotice(null);
+      await logoutMutation.mutateAsync();
     } catch {
       setError(LOGOUT_ERROR);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -151,7 +147,7 @@ export default function useAuthSession() {
   };
 
   const updateSessionActorName = (name: string) => {
-    setSession((prevSession) =>
+    queryClient.setQueryData<AuthSession | null>(queryKeys.auth.session, (prevSession) =>
       prevSession
         ? {
             ...prevSession,
@@ -164,11 +160,16 @@ export default function useAuthSession() {
     );
   };
 
+  const isSubmitting =
+    loginMutation.isPending || registerMutation.isPending || logoutMutation.isPending;
+  const effectiveError =
+    error ?? (sessionQuery.isError ? SESSION_LOAD_ERROR : null);
+
   return {
-    session,
-    isLoading,
+    session: sessionQuery.data ?? null,
+    isLoading: sessionQuery.isPending,
     isSubmitting,
-    error,
+    error: effectiveError,
     notice,
     setNotice,
     login,

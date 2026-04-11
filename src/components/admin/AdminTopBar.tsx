@@ -1,5 +1,5 @@
 import { Home, LogOut, Shield } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "../../router-adapter";
 
 import type { AuthSession } from "../../types/auth";
 

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CreditCard, Download, SlidersHorizontal } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "../../../router-adapter";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type { BillingCycleView } from "../../../types/dashboard";
 import {
@@ -8,6 +9,8 @@ import {
   fetchBillingCycles,
   verifyBillingCheckoutSession,
 } from "../../../lib/dashboard-client";
+import { invalidateCheckoutQueries } from "../../../lib/query-invalidations";
+import { queryKeys } from "../../../lib/query-keys";
 import EmptyState from "../shared/EmptyState";
 import BillingSummaryCard from "../billing/BillingSummaryCard";
 import BillingNextPaymentCard from "../billing/BillingNextPaymentCard";
@@ -34,10 +37,8 @@ const PAGE_SIZE = 12;
  *  • BillingPagination     — client-side pagination footer
  */
 export default function BillingPage() {
+  const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [cycles, setCycles] = useState<BillingCycleView[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [checkoutNotice, setCheckoutNotice] = useState<string | null>(null);
   const [payingCycleId, setPayingCycleId] = useState<string | null>(null);
@@ -45,23 +46,26 @@ export default function BillingPage() {
   const [filter, setFilter] = useState<FilterStatus>("ALL");
   const [page, setPage] = useState(0);
 
-  const loadBillingCycles = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+  const billingCyclesQuery = useQuery({
+    queryKey: queryKeys.billing.all,
+    queryFn: fetchBillingCycles,
+    staleTime: 60 * 1000,
+  });
 
-    try {
-      const data = await fetchBillingCycles();
-      setCycles(data);
-    } catch {
-      setError("Failed to load billing history.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const verifyCheckoutMutation = useMutation({
+    mutationFn: verifyBillingCheckoutSession,
+  });
 
-  useEffect(() => {
-    void loadBillingCycles();
-  }, [loadBillingCycles]);
+  const createCheckoutMutation = useMutation({
+    mutationFn: createBillingCheckoutSession,
+  });
+
+  const cycles: BillingCycleView[] = useMemo(
+    () => billingCyclesQuery.data ?? [],
+    [billingCyclesQuery.data],
+  );
+  const isLoading = billingCyclesQuery.isPending;
+  const error = billingCyclesQuery.isError ? "Failed to load billing history." : null;
 
   useEffect(() => {
     const checkoutStatus = searchParams.get("checkout");
@@ -88,7 +92,8 @@ export default function BillingPage() {
 
     const verify = async () => {
       try {
-        await verifyBillingCheckoutSession(sessionId);
+        await verifyCheckoutMutation.mutateAsync(sessionId);
+        await invalidateCheckoutQueries(queryClient);
         if (!cancelled) {
           setCheckoutNotice("Payment confirmed and billing status updated.");
           setActionError(null);
@@ -102,7 +107,6 @@ export default function BillingPage() {
       } finally {
         if (!cancelled) {
           setHandledCheckoutSessionId(sessionId);
-          void loadBillingCycles();
           const nextParams = new URLSearchParams(searchParams);
           nextParams.delete("checkout");
           nextParams.delete("session_id");
@@ -116,7 +120,13 @@ export default function BillingPage() {
     return () => {
       cancelled = true;
     };
-  }, [handledCheckoutSessionId, loadBillingCycles, searchParams, setSearchParams]);
+  }, [
+    handledCheckoutSessionId,
+    queryClient,
+    searchParams,
+    setSearchParams,
+    verifyCheckoutMutation,
+  ]);
 
   const handlePayInAdvance = useCallback(async (cycle: BillingCycleView) => {
     setActionError(null);
@@ -124,7 +134,7 @@ export default function BillingPage() {
     setPayingCycleId(cycle.id);
 
     try {
-      const checkout = await createBillingCheckoutSession(cycle.id);
+      const checkout = await createCheckoutMutation.mutateAsync(cycle.id);
       window.location.href = checkout.checkoutUrl;
     } catch (err) {
       const message =
@@ -132,7 +142,7 @@ export default function BillingPage() {
       setActionError(message);
       setPayingCycleId(null);
     }
-  }, []);
+  }, [createCheckoutMutation]);
 
   // Reset to first page when filter changes
   useEffect(() => {
